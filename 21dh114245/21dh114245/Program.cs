@@ -304,16 +304,14 @@ public static class Buoi1
 
 public static class Buoi2
 {
-     //khai báo biến toàn cục
-    static int[,] v_arrayMatrix;
-    //bậc của đỉnh
-    static int[] v_degrees;
+    // khai báo biến toàn cục vd: m,n 
     static int n, m;
-    static int[] v_outDegrees;
-    static int[] v_inDegrees;
-    //tạo danh sách kề cho đồ thị bài 3
-    static List<List<int>> v_listMatrix3 = new List<List<int>>();  // danh sách chứa từng cặp phần tử gồm nhiều giá trị 
-    static int[] v_seenEdges;
+    static Dictionary<int, List<int>> vout_adjacencyList1 = new Dictionary<int, List<int>>();
+
+    static List<List<int>> v_listMatrix2;
+    static List<CEdge> v_edges2;
+
+
 
     public static void Run()
     {
@@ -323,20 +321,177 @@ public static class Buoi2
         //Bai4();
     }
 
+    
+    /*
+     * Bài 1 chuyển đổi thành Danh Sách Kề Convert Edge List 
+     * Dữ liệu vào: File văn bản Canh2Ke.INP 
+        • Dòng đầu tiên chứa hai số nguyên: 𝑛,𝑚 tương ứng là số đỉnh và số cạnh của đồ thị. 
+        • 𝑚 dòng tiếp theo, mỗi dòng chứa hai đỉnh mô tả cạnh nối 2 đỉnh đ
+     */
+    public static void ReadMatrixBai_1(string inp_file) {
+        using (StreamReader reader = new StreamReader(inp_file))
+        {
+            var firstLine = reader.ReadLine().Split();
+            n = int.Parse(firstLine[0]);
+            m = int.Parse(firstLine[1]);
+
+            for (int i = 1; i <= n; i++)
+            {
+                vout_adjacencyList1[i] = new List<int>();
+            }
+
+            for (int i = 0; i < m; i++)
+            {
+                var edge = reader.ReadLine().Split().Select(int.Parse).ToArray();
+                int u = edge[0], v = edge[1];
+                vout_adjacencyList1[u].Add(v);
+                vout_adjacencyList1[v].Add(u); // Đồ thị vô hướng
+            }
+        }
+
+    }
+
+    public static void ConvertEdgeListBai_1()
+    {
+        foreach (var key in vout_adjacencyList1.Keys)
+        {
+            vout_adjacencyList1[key].Sort();
+        }
+    }
+
+    /*
+     * Dữ liệu ra: File văn bản Canh2Ke.OUT 
+        • Dòng đầu tiên chứa số đỉnh 𝑛 
+        • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng 
+        với một cạnh (𝑖,𝑗) của đồ thị (các đỉnh trong danh sách được sắp xếp từ nhỏ đến lớn). 
+     */
+
+    public static void WriteFileBai_1(string out_file)
+    {
+        //Ghi kết quả ra file Canh2Ke.OUT
+        using (StreamWriter writer = new StreamWriter(out_file))
+        {
+            // ghi số đỉnh
+            writer.WriteLine(n);
+            
+            //ghi danh sách kề 
+            for(int i = 0;i <= n;i++)
+            {
+                if (vout_adjacencyList1[i].Count > 0)
+                {
+                    writer.WriteLine(string.Join(" ", vout_adjacencyList1[i]));
+                }
+                else
+                {
+                    writer.WriteLine(); //Dòng rỗng nếu không có cạnh 
+                }
+            }
+          
+
+        }
+        Console.WriteLine("Successfully write file");
+
+    }
+   
+
+    static void Bai1()
+    {
+
+        ReadMatrixBai_1("Canh2Ke.INP");
+        ConvertEdgeListBai_1();
+        WriteFileBai_1("Canh2Ke.OUT");
+    }
+
+    /*
+     *Bài 2 : Chuyển danh sách kề sang danh sách cạnh 
+     * Dữ liệu vào: File văn bản Ke2Canh.INP 
+        • Dòng đầu tiên chứa số đỉnh 𝑛 
+        • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng 
+        với một cạnh (𝑖,𝑗) của đồ thị (các đỉnh trong danh sách được sắp xếp từ nhỏ đến lớn). 
+     * */
+    public static void ReadMatrixBai_2(string inp_file) {
+        using (StreamReader reader = new StreamReader(inp_file))
+        {
+            n = int.Parse(reader.ReadLine()); // Đọc số đỉnh
+            v_listMatrix2 = new List<List<int>>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var line = reader.ReadLine();
+                if (!string.IsNullOrEmpty(line))
+                {
+                    v_listMatrix2.Add(line.Split().Select(int.Parse).ToList());
+                }
+                else
+                {
+                    v_listMatrix2.Add(new List<int>()); // Đỉnh không có cạnh nào
+                }
+            }
+        }
+    }
+
+
+
     class CEdge
     {
-        public int U { get; set; } ;
-        public int V { get; set; } ;
+        public int U { get; set; }
+        public int V { get; set; }
 
-        public CEdge(int u, int v);
+        public CEdge(int u, int v)
+        {
+            U = u;
+            V = v;
+        }
     }
     public static void ConvertToEdgeList2()
     {
-        v_edges2 = new List<CEdge>();
-        //tạo chuỗi không trùng phần tử 
-        HashSet<string> edges = new HashSet<string>();
-        for(int u = 0; u <n ; u ++)
+       v_edges2 = new List<CEdge>();
+       //tạo chuỗi không trùng phần tử 
+       HashSet<string> edges = new HashSet<string>();
+       for(int u = 0; u <n ; u++)
+       {
+            foreach (int v in v_listMatrix2[u])
+            {
+                //u + 1 : đỉnh 1...5
+                string edgeKey = u + 1 < v ? $"{u + 1}-{v}" : $"{v}-{u + 1}";// đảm bảo không bị trùng lặp
+                if (!edges.Contains(edgeKey))
+                {
+                    edges.Add(edgeKey);
+                    v_edges2.Add(new CEdge(u + 1, v));
+                }
+            }
+        }
     }
+
+    /*
+     * Dữ liệu ra: File văn bản Ke2Canh.OUT 
+        • Dòng đầu tiên chứa hai số nguyên: 𝑛,𝑚 tương ứng là số đỉnh và số cạnh
+        • 𝑚 dòng tiếp theo, mỗi dòng chứa hai đỉnh mô tả cạnh nối 2 đỉnh đó 
+     */
+    public static void WriteFileBai_2(string out_file)
+    {
+        //Ghi kết quả ra file Canh2Ke.OUT
+        using (StreamWriter writer = new StreamWriter(out_file))
+        {
+            // ghi số đỉnh
+            writer.WriteLine($"{n} {v_edges2.Count}");
+            foreach (var edge in v_edges2)
+            {
+                writer.WriteLine($"{edge.U} {edge.V}");
+            }
+
+        }
+        Console.WriteLine("Successfully write file");
+
+    }
+
+    public static void Bai2()
+    {
+        ReadMatrixBai_2("Ke2Canh.INP");
+        ConvertToEdgeList2();
+        WriteFileBai_2("Ke2Canh.OUT");
+    }
+
 }
 
 public static class Buoi3
@@ -346,7 +501,7 @@ public static class Buoi3
     static int[,] v_arrayMatrix;
     //bậc của đỉnh
     static int[] v_degrees;
-    static int[] v_result1
+    static int[] v_result1;
     static int n, m, s; //s là đỉnh
     static int x, y ;
     static int[] v_adjList;
@@ -490,8 +645,8 @@ public static class Buoi3
         //Khởi tạo 
         for(int i = 0; i < n; i++)
         {
-            v_parent2[i] = -1; 
-            v_visited[i] = false
+            v_parent2[i] = -1;
+            v_visited[i] = false;
         }
 
         //Bắt đầu BFS từ đỉnh n
@@ -536,20 +691,20 @@ public static class Buoi3
         {
             using (StreamWriter writer = new StreamWriter(out_file))
             {
-               List<int> path = new List<int>();
-               //Lập duyệt mảng v_parent2
-               while(current != -1)
-               {
+                List<int> path = new List<int>();
+                //Lập duyệt mảng v_parent2
+                while (current != -1)
+                {
                     path.Add(current);
                     current = v_parent2[current];
-               }
-               //path.Bowrse();
-               writer.WriteLine(path.Count);
-               writer.WriteLine(string.Join(" ", path));            
+                }
+                //path.Bowrse();
+                writer.WriteLine(path.Count);
+                writer.WriteLine(string.Join(" ", path));
             }
             Console.WriteLine("Successfully write file");
         }
-        else (Console.WriteLine("Not found"))
+        else (Console.WriteLine("Not found"));
     }
     
 
