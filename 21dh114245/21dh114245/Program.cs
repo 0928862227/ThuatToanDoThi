@@ -13,7 +13,7 @@ namespace _21dh114245
     {
         static void Main(string[] args)
         {
-            Buoi1.Run();
+            //Buoi1.Run();
         }
     }
 
@@ -864,9 +864,9 @@ public static class Buoi3
         • Dòng duy nhất ghi số lượng miền liên thông tìm được
      */
 
-    static void WriteFileBai_4(string out_file)
+    static void WriteFileBai_4(string out_file, int count)
     {
-
+        File.WriteAllText(out_file, count.ToString());
     }
 
 
@@ -881,7 +881,7 @@ public static class Buoi3
         int v_count = CountConnectedComponents();
 
         // 4.3.Ghi kết quả ra file
-        WriteFileBai_4("LienThong.OUT");
+        WriteFileBai_4("LienThong.OUT",v_count);
     }
 
 
@@ -889,5 +889,200 @@ public static class Buoi3
 
 public static class Buoi4
 {
+    static int m,n,s,x,y;
+    static List<int>[] v_adjList;
+    static List<int> v_result;
+    static bool[] v_visited;
+
+
+    static List<int> v_path;
+    static int[] v_parent;
+    public static void Run()
+    {
+        //Bai1();
+        //Bai2();
+        
+    }
+
+
+    /*Hãy cho biết từ đỉnh 𝑠 có thể đi đến được những đỉnh nào (sử dụng thuật toán Depth First Search– DFS). 
+     * Khi một đỉnh có nhiều đỉnh kề, thì các đỉnh được xét theo thứ tự từ nhỏ đến lớn. 
+     * Dữ liệu vào: File văn bản DFS.INP
+        • Dòng đầu tiên chứa hai số nguyên: 𝑛, 𝑠 tương ứng là số đỉnh của đồ thị và đỉnh 𝑠.
+        • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng
+        với một cạnh (𝑖, 𝑗) của đồ thị. 
+     */
+
+    static void ReadMatrixBai_1( string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        //Dòng đầu tiên chứa số đỉnh (n) và Startnode (s)
+        string[] firstLine = lines[0].Split(new[] { ' '}, StringSplitOptions.RemoveEmptyEntries);
+        n = int.Parse(firstLine[0]); // Đọc số đỉnh
+        s = int.Parse(firstLine[1]); // Đọc Startnode 
+
+        // Khởi tạo danh sách kề
+        v_adjList = new List<int>[n];
+        for (int i = 0; i < n; i++)
+        {
+            v_adjList[i] = new List<int>();
+            if (!string.IsNullOrWhiteSpace(lines[i]))
+            {
+                string[] parts = lines[i].Split();
+                foreach(string part in parts)
+                {
+                    v_adjList[i].Add(int.Parse(part));  
+                }
+            }
+        }     
+    }
+
+    static void Process_DepthFirstSearchBai_1()
+    {
+        v_visited = new bool[n + 1];
+        v_result = new List<int>();
+        Stack<int> v_Stack = new Stack<int>();
+        v_Stack.Push(s); //Đưa đỉnh s vào stack
+        v_visited[s] = true;
+       
+       while(v_Stack.Count > 0)
+        {
+            int node = v_Stack.Pop();
+            // không thêm đỉnh s vào kết quả
+            if(node != s)
+            {
+                v_result.Add(node);
+            }
+            //Duyệt danh sách kề từ lớn đến nhỏ để đảm bảo DFS đi theo từ nhỏ đến lớp
+            //Có thể đảo lại từ lớn đến nhỏ
+            for(int i = v_adjList[node].Count - 1; i >= 0; i--)
+            {
+                int neighbor = v_adjList[node][i];
+                if (!v_visited[neighbor])
+                {
+                    v_Stack.Push(neighbor);
+                    v_visited[neighbor] = true; 
+                }
+            }
+       }
+    }
+
+    /*
+     * Dữ liệu ra: File văn bản DFS.OUT
+        • Dòng đầu tiên ghi số 𝑘 là số lượng đỉnh tìm được.
+        • Dòng thứ hai ghi 𝑘 đỉnh tìm được. 
+     */
+    static void WriteFileBai_1(string out_file)
+    {
+
+    }
+
+    //Hàm chuẩn bị chạy bài 1
+    static void Bai1()
+    {
+        ReadMatrixBai_1("DFS.INP");
+        Process_DepthFirstSearchBai_1();
+        WriteFileBai_1("DFS.OUT");
+    }
+
+
+    /*Hãy tìm đường đi từ đỉnh 𝑥 đến đỉnh 𝑦 bằng thuật toán DFS.
+     * Dữ liệu vào: File văn bản TimDuongDFS.INP
+        • Dòng đầu tiên chứa số 3 số nguyên: 𝑛, 𝑥, 𝑦.
+        • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng
+        với một cạnh (𝑖, 𝑗) của đồ thị. 
+     */
+    static void ReadMatrixBai_2(string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        //Dòng đầu tiên chứa số đỉnh (n) và x,y
+        string[] firstLine = lines[0].Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        n = int.Parse(firstLine[0]); // Đọc số đỉnh
+        x = int.Parse(firstLine[1]); // Đọc x  '
+        y = int.Parse(firstLine[2]); // Đọc y                          
+
+        // Khởi tạo danh sách kề
+        v_adjList = new List<int>[n];
+        for (int i = 0; i < n; i++)
+        {
+            v_adjList[i] = new List<int>();
+            if (!string.IsNullOrWhiteSpace(lines[i]))
+            {
+                string[] parts = lines[i].Split();
+                foreach (string part in parts)
+                {
+                    v_adjList[i].Add(int.Parse(part));
+                }
+            }
+        }
+    }
+
+    static void Process_DepthFirstSearchBai_2()
+    {
+        Stack<int> stack = new Stack<int>();
+        v_parent = new int[n + 1];
+        v_visited = new bool[n + 1];
+        v_path = new List<int>();
+
+        stack.Push(x);
+        v_visited[x] = true;
+        v_parent[x] = -1; // Đỉnh đầu tiên không có cha
+        //Làm rỗng đường đi giữa 2 đỉnh
+        v_path.Clear();
+       
+
+        while (stack.Count > 0)
+        {
+            int u = stack.Pop();
+            // Nếu tìm được đỉnh đích
+            if (u == y)
+            {
+                //Dựng đường đi từ y về x
+                int current = y;
+                while (current != -1) //Truy ngược đích cha để lấy đường đi chính xác
+                {
+                    v_path.Add(current);
+                    current = v_parent[current];
+                }
+                v_path.Reverse();
+                return;
+            }
+            //Kiểm tra đã check chưa và duyệt kề của nó 
+            foreach(int v in v_adjList[u])
+            {
+                if (!v_visited[u]) //đỉnh chưa check
+                {
+                    v_visited[v] = true; 
+                    stack.Push(v);
+                    v_parent[v] = u; // Lưu lại đường đi 
+                }
+            }
+           
+        }
+    }
+
+    /*
+     * Dữ liệu ra: File văn bản TimDuongDFS.OUT
+        • Dòng đầu tiên ghi số nguyên dương 𝑘 là số đỉnh nằm trên đường đi từ đỉnh 𝑥 đến đỉnh 𝑦 (Tính
+        luôn cả đỉnh 𝑥 và 𝑦).
+        • Dòng thứ hai chứa 𝑘 số nguyên là các đỉnh trên đường đi từ 𝑥 đến 𝑦. 
+     */
+    static void WriteFileBai_2 (string out_file)
+    {
+
+    }
+
+    //Hàm chuẩn bị chạy bài 2
+    static void Bai2()
+    {
+        ReadMatrixBai_2("TimDuongDFS.INP");
+        Process_DepthFirstSearchBai_2();
+        WriteFileBai_2("TimDuongDFS.OUT");
+    }
+
 
 }
