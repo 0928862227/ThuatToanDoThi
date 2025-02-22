@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -504,8 +505,12 @@ public static class Buoi3
     static int[] v_result1;
     static int n, m, s; //s là đỉnh
     static int x, y ;
-    static int[] v_adjList;
+    static List<int>[] v_adjList;
     static int[] v_parent2;
+
+    static bool v_result3;
+
+    static bool[] v_visited4;
 
     public static void Run()
     {
@@ -524,7 +529,7 @@ public static class Buoi3
 
     link file đọc auto : ....\21dh114245\21dh114245\bin\Debug\...
 
-    */
+    
     static void ReadMatrixBai_1(string inp_file)
     {
         //đọc dữ liệu từ file đầu vào
@@ -608,7 +613,7 @@ public static class Buoi3
         • Dòng đầu tiên chứa số 3 số nguyên: 𝑛, 𝑥, 𝑦.
         • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng với
         một cạnh (𝑖,𝑗) của đồ thị.
-     */
+     
     static void ReadMatrixBai_2 (string inp_file)
     {
         //đọc dữ liệu từ file đầu vào
@@ -683,7 +688,7 @@ public static class Buoi3
         • Dòng đầu tiên ghi số nguyên dương 𝑘 là số đỉnh nằm trên đường đi từ đỉnh 𝑥 đến đỉnh 𝑦 (Tính luôn
             cả đỉnh 𝑥 và 𝑦).
         • Dòng thứ hai chứa 𝑘 số nguyên là các đỉnh trên đường đi từ 𝑥 đến 𝑦. 
-     */
+     
      static void WriteFileBai_2(string out_file)
     {
         int current = y;
@@ -706,7 +711,183 @@ public static class Buoi3
         }
         else (Console.WriteLine("Not found"));
     }
-    
+    */
 
+    /* Bài 3: h kiểm tra đồ thị 𝐺 có liên thông không. 
+     *  Dữ liệu vào: File văn bản LienThong.INP
+        • Dòng đầu tiên chứa số nguyên 𝑛 là số đỉnh của đồ thị.
+        • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng với
+        một cạnh (𝑖,𝑗) của đồ thị.
+     *link file đọc auto : ....\21dh114245\21dh114245\bin\Debug\...
+     */
+    static void ReadMatrixBai_3 (string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        //số đỉnh của đồ thị
+        n = int.Parse(lines[0]);
+
+        // Khởi tạo danh sách kề
+        v_adjList = new List<int>[n];
+        for (int i = 0; i < n; i++)
+        {
+            v_adjList[i] = new List<int>();
+        }
+
+        // Đọc các cạnh từ các dòng tiếp theo
+        for (int i = 1; i <= n; i++)
+        {
+            string[] edges = lines[i].Split();
+            foreach (string edge in edges)
+            {
+                int j = int.Parse(edge) - 1; // giảm đi 1 vì danh sách bắt đầu từ 0
+                v_adjList[i - 1].Add(j); // thêm cạnh (i, j) vào danh sách kề
+            }
+        }
+
+    }
+
+    static bool GraphConnectedBai_3()
+    {
+        //Mảng đánh dấu các đỉnh đã duyệt 
+        bool[] visited = new bool[n +1 ];
+        int startNode = -1;
+
+        //Hàng đợi cho BFS
+        Queue<int>queue = new Queue<int> ();
+        startNode = 1;  // Đỉnh bắt đầu là 1
+
+        //Thêm đỉnh 1 vào queue
+        queue.Enqueue (startNode);
+        visited[startNode] = true;
+
+        //Nếu queue còn thì lặp 
+        while (queue.Count > 0)
+        {
+            //Đọc queue vào u 
+            int u = queue.Dequeue ();
+
+            //Duyệt đỉnh kề của u 
+            foreach(int v in v_adjList[u])
+            {
+                if (!visited[v]) //Nếu đỉnh kề của u chưa duyệt thì duyệt 
+                {
+                    //Đánh dấu đã duyệt đến đỉnh kề 
+                    visited[v] = true;
+                    //Thêm đỉnh kề của u vào queue
+                    queue.Enqueue (v);
+                }
+            }
+        }
+        // Kiểm tra xem tất cả các đỉnh có cạnh đã duyệt hay chưa 
+        for(int i = 0; i < n; i++)
+        {
+            if(!visited[i])
+                return false;
+        }
+        return true;
+    }
+
+    /*
+     * Dữ liệu ra: File văn bản LienThong.OUT
+        • Dòng duy nhất ghi ra chữ "YES" nếu đồ thị liên thông, ngược lại ghi chữ "NO"
+     */
+    static void WriteFileBai_3 (string out_file)
+    {
+        File.WriteAllText(out_file, v_result3 ? "YES" : "NO");
+        Console.WriteLine(string.Join(" ", "write file 3", v_result3 ? "YES" : "NO"));
+    }
+
+    //Hàm chuẩn bị chạy bài 3
+    static void Bai3()
+    {
+        ReadMatrixBai_3("LienThong.INP");
+        v_result3 = GraphConnectedBai_3();
+        WriteFileBai_3("LienThong.OUT");
+    }
+
+
+
+    /*Bai4:  Miền liên thông là tập đỉnh liên thông với nhau và nếu thêm một đỉnh khác thì không còn liên thông nữa. 
+     * Hãy viết chương trình cho biết 𝐺 có bao nhiêu miền liên thông.
+     *Dữ liệu vào: File văn bản DemLienThong.INP
+       • Dòng đầu tiên chứa số nguyên 𝑛 là số đỉnh của đồ thị.
+       • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng với
+        một cạnh (𝑖,𝑗) của đồ thị.
+
+     */
+    static void ReadMatrixBai_4 (string imp_file)
+    {
+        ReadMatrixBai_3(imp_file);
+    }
+
+    static int CountConnectedComponents()
+    {
+        v_visited4 = new bool[n + 1]; //Khởi tạo mảng đánh dấu 
+        int count = 0; // Biến đếm số miền liên thông 
+
+        //Duyệt từng đỉnh 
+        for(int i = 0; i < n; i++)
+        {
+            if (!v_visited4[i]) //Nếu đỉnh chưa duyệt và có ít nhất 1 cạnh 
+            {
+                BFS(i); //Gọi BFS để duyệt toàn bộ miền liên thông 
+                count++; //Tăng số miền liên thông
+            }
+        }
+        return count;
+    }
+
+    private static void BFS (int start)
+    {
+        Queue <int> queue = new Queue<int> (); 
+        queue.Enqueue (start);
+        v_visited4[start] = true;
+
+        while(queue.Count > 0)
+        {
+            int u = queue.Dequeue ();   
+            foreach(int v in v_adjList[u])
+            {
+                if (!v_visited4[v])
+                {
+                    v_visited4[v] = true;
+                    queue.Enqueue(v);
+                }
+            }
+        }
+    }
+
+    /*
+     * Dữ liệu ra: File văn bản DemLienThong.OUT
+        • Dòng duy nhất ghi số lượng miền liên thông tìm được
+     */
+
+    static void WriteFileBai_4(string out_file)
+    {
+
+    }
+
+
+    //Hàm chuẩn bị chạy bài 4
+    static void Bai4()
+    {
+
+        // 4.1. Đọc dữ liệu từ file
+        ReadMatrixBai_4("DemLienThong.INP");
+
+        // 4.2 Xử lý thuật toán BFS để kiểm tra liên thông các đỉnh
+        int v_count = CountConnectedComponents();
+
+        // 4.3.Ghi kết quả ra file
+        WriteFileBai_4("LienThong.OUT");
+    }
+
+
+}
+
+public static class Buoi4
+{
 
 }
