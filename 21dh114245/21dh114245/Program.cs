@@ -14,6 +14,9 @@ namespace _21dh114245
         static void Main(string[] args)
         {
             //Buoi1.Run();
+            //Buoi2.Run();
+            //Buoi3.Run();
+            //Buoi4.Run();
         }
     }
 
@@ -312,7 +315,10 @@ public static class Buoi2
     static List<List<int>> v_listMatrix2;
     static List<CEdge> v_edges2;
 
+    static List<List<int>> v_listMatrix3;
+    static List<int> reservoirs;
 
+    static List<List<int>> v_listMatrix4;
 
     public static void Run()
     {
@@ -320,6 +326,7 @@ public static class Buoi2
         //Bai2();
         //Bai3();
         //Bai4();
+        //Bai5();
     }
 
     
@@ -491,6 +498,187 @@ public static class Buoi2
         ReadMatrixBai_2("Ke2Canh.INP");
         ConvertToEdgeList2();
         WriteFileBai_2("Ke2Canh.OUT");
+    }
+
+    /*
+     * Bài 3: Viết chương trình tìm các đỉnh bồn chứa 
+     * Dữ liệu vào: File văn bản BonChua.INP 
+        • Dòng đầu tiên chứa số đỉnh 𝑛 của đồ thị. 
+        • 𝑛 dòng tiếp theo là ma trận kề của đồ thị. 
+     */
+    public static void ReadMatrixBai_3(string inp_file)
+    {
+        using (StreamReader reader = new StreamReader(inp_file))
+        {
+            n = int.Parse(reader.ReadLine().Trim()); // Đọc số đỉnh, loại bỏ khoảng trắng dư
+
+            v_listMatrix3 = new List<List<int>>();
+
+            for (int i = 0; i < n; i++)
+            {
+                var line = reader.ReadLine()?.Trim(); // Đọc dòng tiếp theo, loại bỏ khoảng trắng
+                if (string.IsNullOrEmpty(line))
+                {
+                    throw new Exception($"Dòng {i + 1} bị thiếu dữ liệu trong file {inp_file}");
+                }
+
+                var row = line.Split().Select(int.Parse).ToList();
+
+                if (row.Count != n)
+                {
+                    throw new Exception($"Dòng {i + 1} có {row.Count} phần tử, nhưng cần {n} phần tử");
+                }
+
+                v_listMatrix3.Add(row);
+            }
+        }
+    }
+
+    public static void FindReservoirs()
+    {
+        reservoirs = new List<int>();
+
+        for (int i = 0; i < n; i++)
+        {
+            bool hasOutgoing = false;  // Kiểm tra xem đỉnh i có cung ra hay không
+            bool hasIncoming = false;  // Kiểm tra xem đỉnh i có cung vào hay không
+
+            for (int j = 0; j < n; j++)
+            {
+                if (v_listMatrix3[i][j] == 1) hasOutgoing = true; // Có cung ra
+                if (v_listMatrix3[j][i] == 1) hasIncoming = true; // Có cung vào
+            }
+
+            if (hasIncoming && !hasOutgoing)
+            {
+                reservoirs.Add(i + 1); // Chuyển về đánh số từ 1
+            }
+        }
+    }
+
+    /*
+     * Dữ liệu ra: File văn bản BonChua.OUT 
+        • Dòng đầu là số nguyên dương 𝑘 là số lượng bồn chứa trong đồ thị (Ghi 0 nếu 𝐺 không có bồn chứa). 
+        • Nếu 𝑘 >0 thì dòng thứ hai chứa danh sách các đỉnh bồn chứa (các đỉnh được sắp theo thứ tự từ nhỏ 
+        đến lớn). 
+     */
+    public static void WriteFileBai_3(string out_file)
+    {
+        //Ghi kết quả ra file BonChua.OUT
+        using (StreamWriter writer = new StreamWriter(out_file))
+        {
+            writer.WriteLine(reservoirs.Count);
+            if (reservoirs.Count > 0)
+            {
+                writer.WriteLine(string.Join(" ", reservoirs));
+            }
+        }
+        Console.WriteLine("Successfully write file");
+
+    }
+
+    public static void Bai3()
+    {
+        ReadMatrixBai_3("BonChua.INP");
+        FindReservoirs();
+        WriteFileBai_3("BonChua.OUT");
+    }
+
+    /*Dữ liệu vào: File văn bản ChuyenVi.INP 
+        • Dòng đầu tiên chứa số đỉnh 𝑛 
+        • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng 
+          với một cung (𝑖,𝑗) của đồ thị 𝐺 (các đỉnh trong danh sách được sắp xếp từ nhỏ đến lớn). 
+     */
+    public static void ReadMatrixBai_4(string inp_file)
+    {
+        ReadMatrixBai_2(inp_file);
+    }
+
+
+    //ChuyenVi
+    public static void ConvertToTransposeGraph()
+    {
+        // Tạo danh sách kề cho đồ thị chuyển vị
+        List<List<int>> transposeGraph = new List<List<int>>(new List<int>[n]);
+
+        for (int i = 0; i < n; i++)
+        {
+            transposeGraph[i] = new List<int>(); // Khởi tạo danh sách rỗng cho từng đỉnh
+        }
+
+        // Duyệt qua danh sách kề ban đầu và đảo hướng cạnh
+        for (int u = 0; u < n; u++)
+        {
+            foreach (int v in v_listMatrix4[u])
+            {
+                transposeGraph[v - 1].Add(u + 1); // Đảo hướng từ (u → v) thành (v → u)
+            }
+        }
+
+        // Sắp xếp danh sách kề của mỗi đỉnh theo thứ tự tăng dần
+        for (int i = 0; i < n; i++)
+        {
+            transposeGraph[i].Sort();
+        }
+
+        // Lưu lại đồ thị chuyển vị vào biến toàn cục để ghi file
+        v_listMatrix4 = transposeGraph;
+    }
+
+    /*
+     * Dữ liệu ra: File văn bản ChuyenVi.OUT 
+        • Dòng đầu tiên chứa số đỉnh 𝑛 
+        • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng 
+          với một cung (𝑖,𝑗) của đồ thị 𝐺𝑇 (các đỉnh trong danh sách được sắp xếp từ nhỏ đến lớn)
+     */
+    public static void WriteFileBai_4(string out_file)
+    {
+        using (StreamWriter writer = new StreamWriter(out_file))
+        {
+            writer.WriteLine(n); // Ghi số đỉnh
+
+            for (int i = 0; i < n; i++)
+            {
+                if (v_listMatrix2[i].Count > 0)
+                {
+                    writer.WriteLine(string.Join(" ", v_listMatrix2[i]));
+                }
+                else
+                {
+                    writer.WriteLine(); // Nếu đỉnh i không có cạnh nào, ghi dòng trống
+                }
+            }
+        }
+        Console.WriteLine("Successfully wrote file: " + out_file);
+    }
+    public static void Bai4()
+    {
+        ReadMatrixBai_4("ChuyenVi.INP");
+        ConvertToTransposeGraph();
+        WriteFileBai_4("ChuyenVi.OUT");
+    }
+
+    /*  Bai 5: Tìm các cạnh có độ dài dài nhất và tính độ dài trung bình của các cạnh.
+     * Dữ liệu vào: File văn bản TrungBinhCanh.INP 
+        • Dòng đầu tiên chứa hai số nguyên: 𝑛,𝑚 tương ứng là số đỉnh và số cạnh của đồ thị. 
+        • 𝑚 dòng tiếp theo, mỗi dòng chứa ba số nguyên: 𝑢,𝑣,𝑤 mô tả cạnh (𝑢,𝑣) có trọng số 𝑤. 
+     */
+    public static void ReadMatrixBai_5(string inp_file)
+    {
+
+    }
+
+
+
+    /*
+     * Dữ liệu ra: File văn bản TrungBinhCanh.OUT 
+        • Dòng thứ nhất chứa độ dài trung bình các cạnh (lấy 2 số lẻ thập phân) 
+        • Dòng thứ 2 chứa số 𝑘 là số lượng cạnh có độ dài dài nhất. 
+        • 𝑘 dòng tiếp theo 𝑘 bộ số (𝑢,𝑣,𝑤) 𝑘 cạnh dài nhất
+     */
+    public static void WriteMatrixBai_5(string out_file)
+    {
+
     }
 
 }
