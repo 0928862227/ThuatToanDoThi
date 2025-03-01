@@ -17,6 +17,7 @@ namespace _21dh114245
             //Buoi2.Run();
             //Buoi3.Run();
             //Buoi4.Run();
+            //Buoi5.Run();
         }
     }
 
@@ -1272,5 +1273,352 @@ public static class Buoi4
         WriteFileBai_2("TimDuongDFS.OUT");
     }
 
+
+}
+
+public static class Buoi5
+{
+    static int m, n, s, x, t;
+    static List<(int, int)>[] v_MatrixGraph;
+    static int[] v_dist;
+    static bool[] v_visited;
+
+    static int[] v_dist3;
+    const int INF = int.MaxValue;
+    static int[] v_parent;
+    public static void Run()
+    {
+        //Bai1();
+        //Bai2();
+        //Bai3();
+    }
+
+    /* Bài 1: Hãy tìm đường đi ngắn nhất từ đỉnh 𝑠 đến đỉnh 𝑡 theo thuật toán Dijkstra. 
+     * Dữ liệu vào: File văn bản Dijkstra.INP
+        • Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, 𝑠, 𝑡 (tương ứng với số đỉnh , số cạnh
+        và 2 đỉnh 𝑠, 𝑡 của đồ thị).
+        • 𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
+     */
+    static void ReadMatrixBai_1 (string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        // Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, 𝑠, 𝑡
+        string[] firstLine = lines[0].Split();
+        n = int.Parse(firstLine[0]); // Đọc số đỉnh
+        m = int.Parse(firstLine[1]); // Đọc số cạnh
+        s = int.Parse(firstLine[2]); // Đọc đỉnh bắt đầu
+        t = int.Parse(firstLine[3]); // Đọc đỉnh kết thúc
+
+        // Khởi tạo ma trận
+        v_MatrixGraph = new List<(int, int)>[n+1];
+        for (int i = 0; i < n; i++)
+        {
+            v_MatrixGraph[i] = new List<(int, int)>();
+        }
+
+        //𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
+        for (int i = 0; i <= m; i++)
+        {
+            string[] edge = lines[i].Split();
+            int u = int.Parse(edge[0]); //(đầu cạnh)
+            int v = int.Parse(edge[1]); //(cuối cạnh)
+            int w = int.Parse(edge[2]); //trọng số 
+
+            v_MatrixGraph[u].Add((v, w)); // Đỉnh u có kề v với trọng số w
+            v_MatrixGraph[v].Add((u, w)); // Đỉnh v có kề u với trọng số w
+        }
+    }
+
+    static void Dijkstral_SortedSet()
+    {
+        v_dist = new int[n + 1];
+        v_parent = new int[n + 1];
+        v_visited = new bool[n + 1];
+
+        for(int i = 0; i <= n; i++)
+        {
+            v_dist[i] = INF; //đánh dấu đường đi dài nhất vô cực (chưa tìm được)
+            v_parent[i] = -1; //đánh dấu chưa có đường đi
+        }
+        v_dist[s] = 0;
+        var v_pq = new SortedSet<(int, int)>();
+        v_pq.Add((0, s));
+
+        while(v_pq.Count > 0)
+        {
+            var (du, u) = v_pq.Min; //Lấy giá trị nhỏ nhất 
+            v_pq.Remove(v_pq.Min); //Xóa khỏi queue
+
+            if (v_visited[u]) continue; //nếu true thì bỏ qua các dòng lệnh sau
+            v_visited[u] = true;
+
+            foreach(var (v, w) in v_MatrixGraph[u])
+            {
+                if (v_dist[u] + w < v_dist[v]) //Nếu tìm thấy đường đi mới, trọng số đỉnh kề mới có nhỏ hơn tổng trọng số đã lưu
+                {
+                    v_dist[v] = v_dist[u] + w;  // Tổng trọng số 
+                    v_parent[v] = u; // Tạo mắc xích mới 
+                    v_pq.Add((v_dist[v], v)); // Thêm vào hàng đợi với độ ưu tiên là khoảng cách
+                }
+            }
+        }
+
+    }
+
+    //queue: lý do sài queue khi tạo ra hàng đợi, nó sẽ tự so sách và tìm ra cạnh có trọng số nhỏ nhất 
+    // INF là 1 hằng số max value đánh dấu sự xuất hiện của trọng số
+
+   /* static void Dijkstral_Queue()
+    {
+        v_dist = new int[n + 1];
+        v_parent = new int[n + 1];
+        v_visited = new bool[n + 1];
+
+        for (int i = 0; i <= n; i++)
+        {
+            v_dist[i] = INF; //đánh dấu đường đi dài nhất vô cực (chưa tìm được)
+            v_parent[i] = -1; //đánh dấu chưa có đường đi
+        }
+        v_dist[s] = 0;
+        var v_pq = new PriorityQueue<(int, int)>();
+        v_pq.Dequeue((0, s));
+
+        while (v_pq.Count > 0)
+        {
+            int u = v_pq.Dequeue; //Lấy giá trị nhỏ nhất 
+            
+
+            if (v_visited[u]) continue; //nếu true thì bỏ qua các dòng lệnh sau
+            v_visited[u] = true;
+
+            foreach (var (v, w) in v_MatrixGraph[u])
+            {
+                if (v_dist[u] + w < v_dist[v]) //Nếu tìm thấy đường đi mới, trọng số đỉnh kề mới có nhỏ hơn tổng trọng số đã lưu
+                {
+                    v_dist[v] = v_dist[u] + w;  // Tổng trọng số 
+                    v_parent[v] = u; // Tạo mắc xích mới 
+                    v_pq.Dequeue((v_dist[v], v)); // Thêm vào hàng đợi với độ ưu tiên là khoảng cách
+                }
+            }
+        }
+
+    }
+   */
+
+    /*
+     * Dữ liệu ra: File văn bản Dijkstra.OUT
+        • Dòng thứ nhất ghi một số nguyên là độ dài đường đi ngắn nhất tìm được
+        • Dòng thứ hai ghi các đỉnh của đường đi từ đỉnh 𝑠 đến đỉnh 𝑡 (bao gồm cả 2 đỉnh 𝑠, 𝑡)
+     */
+    static void WriteFileBai_1(string out_file)
+    {
+        using (StreamWriter sw = new StreamWriter(out_file))
+        {
+            if (v_dist[t] == INF) //Nếu không tìm được đỉnh
+            {
+                sw.WriteLine("-1");
+                return;
+            }
+            sw.WriteLine(v_dist[t]); //In khoảng cách ngắn nhất
+
+            List<int> path = new List<int>();
+            for (int v = t; v != -1; v = v_parent[v])
+                path.Add(v);
+
+            path.Reverse();
+            sw.WriteLine(string.Join(" ", path));
+
+        }
+    }
+
+
+    //Hàm chuẩn bị chạy bài 1
+    static void Bai1()
+    {
+        ReadMatrixBai_1("Dijkstra.INP");
+        Dijkstral_SortedSet();
+        WriteFileBai_1("Dijkstra.OUT");
+    }
+
+
+    /* Bài 2: Đường đi ngắn nhất qua đỉnh trung gian,  Hãy tìm đường đi ngắn từ đỉnh 𝑠 đến đỉnh 𝑡 và đường đi đó phải đi qua đỉnh 𝑥.
+     * Dữ liệu vào: File văn bản NganNhatX.INP
+        • Dòng đầu tiên chứa 5 số nguyên 𝑛, 𝑚, 𝑠, 𝑡, 𝑥 (tương ứng với số đỉnh (𝑛 ≤ 105), số cạnh (𝑚 ≤ 105)
+        và 3 đỉnh 𝑠, 𝑡, 𝑥 của đồ thị).
+        • 𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
+     */
+
+    static void ReadMatrixBai_2(string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        // Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, 𝑠, 𝑡
+        string[] firstLine = lines[0].Split();
+        n = int.Parse(firstLine[0]); // Đọc số đỉnh
+        m = int.Parse(firstLine[1]); // Đọc số cạnh
+        s = int.Parse(firstLine[2]); // Đọc đỉnh bắt đầu
+        t = int.Parse(firstLine[3]); // Đọc đỉnh trung gian
+        x = int.Parse(firstLine[4]); // Đọc đỉnh kết thúc 
+
+        // Khởi tạo ma trận
+        v_MatrixGraph = new List<(int, int)>[n + 1];
+        for (int i = 0; i < n; i++)
+        {
+            v_MatrixGraph[i] = new List<(int, int)>();
+        }
+
+        //𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
+        for (int i = 0; i <= m; i++)
+        {
+            string[] edge = lines[i].Split();
+            int u = int.Parse(edge[0]); //(đầu cạnh)
+            int v = int.Parse(edge[1]); //(cuối cạnh)
+            int w = int.Parse(edge[2]); //trọng số 
+
+            v_MatrixGraph[u].Add((v, w)); // Đỉnh u có kề v với trọng số w
+            v_MatrixGraph[v].Add((u, w)); // Đỉnh v có kề u với trọng số w
+        }
+    }
+
+    private static (int[] , int[]) DijkstraBai_2 (int start)
+    {
+        int[] dist = new int[n + 1];
+        int[] parent = new int[n + 1];
+        bool[] visited = new bool[n + 1];
+
+        for (int i = 0; i <= n; i++)
+        {
+            dist[i] = INF; //đánh dấu đường đi dài nhất vô cực (chưa tìm được)
+            parent[i] = -1; //đánh dấu chưa có đường đi
+        }
+        v_dist[start] = 0;
+
+        //Hàng đợi ưu tiên SortedSet: (khoảng cách, đỉnh)
+        SortedSet<(int, int)> pq = new SortedSet<(int, int)>();
+        pq.Add((0, s));
+
+        while (pq.Count > 0)
+        {
+            var (du, u) = pq.Min; //Lấy đỉnh có khoảng cách nhỏ nhất 
+            pq.Remove(pq.Min); //Xóa khỏi queue
+
+            if (visited[u]) continue; //nếu true thì bỏ qua các dòng lệnh sau
+            visited[u] = true; //Đánh dấu đỉnh đã xét
+
+            foreach (var (v, w) in v_MatrixGraph[u]) // Duyệt các cạnh kề (u + v)
+            {
+                if (dist[u] + w < dist[v]) //Nếu tìm thấy đường đi mới, trọng số đỉnh kề mới có nhỏ hơn tổng trọng số đã lưu
+                {
+                    dist[v] = dist[u] + w;  // Tổng trọng số 
+                    parent[v] = u; // Tạo mắc xích mới 
+                    pq.Add((v_dist[v], v)); // Thêm vào hàng đợi với độ ưu tiên là khoảng cách
+                }
+            }
+        }return (dist, parent);
+    }
+
+    //Hàm truy vết đường đi từ Đỉnh bắt đầu đến đỉnh kết thúc 
+    private static void GetPath(int start, int end, int[] parent, List<int> path)
+    {
+        List<int> temp = new List<int>();
+        int current = end; 
+
+        //Vòng lập truy ngược đường đi 
+        while(current != -1)
+        {
+            temp.Add(current);
+            current = parent[current];
+        }
+        temp.Reverse();
+
+        //Nếu 'path' k rỗng (đã có sẵn phần tử s < v), loại bỏ phần tử đầu trùng lặp 
+        if (path.Count > 0) temp.RemoveAt(0);
+        path.AddRange(temp);
+    }
+
+    static (int, List<int>) FindShortesPath2()
+    {
+        var (distFromS, parentFromS) = DijkstraBai_2(s); // Từ s đến nơi đỉnh
+        var (distFromX, parentFromX) = DijkstraBai_2(x); // Từ x đến nơi đỉnh 
+
+        if (distFromS[x] == INF || distFromX[x] == INF)
+            return (-1, new List<int>()); //K có đường đi 
+
+        int totalDistance = distFromS[x] + distFromX[t]; //Tổng trọng số đường đi 
+        List<int> path = new List<int>();
+
+        //Truy vết đường đi từ s -> x
+        GetPath(s, x, parentFromS, path);
+
+        //Truy vết đường đi từ x -> s
+        GetPath(x, t, parentFromX, path);   
+
+        return (totalDistance, path);
+    }
+
+    /*
+     * Dữ liệu ra: File văn bản NganNhatX.OUT
+        • Dòng thứ nhất ghi một số nguyên là độ dài đường đi ngắn nhất tìm được
+        • Dòng thứ hai ghi các đỉnh của đường đi từ đỉnh 𝑠 đến đỉnh 𝑡 đi qua đỉnh 𝑥 (bao gồm cả 2 đỉnh 𝑠, 𝑡) 
+     */
+    static void WriteFileBai_2(string out_file)
+    {
+        using(StreamWriter sw = new StreamWriter(out_file))
+        {
+            var (distance, v_path) = FindShortesPath2();
+            if(distance == -1)
+            {
+                sw.WriteLine("-1");
+                return;
+            }
+            sw.WriteLine(distance);
+            sw.WriteLine(string.Join(" ", v_path));
+        }
+    }
+
+    //Hàm chuẩn bị chạy bài 2
+    static void Bai2()
+    {
+        ReadMatrixBai_2("NganNhatX.INP");
+        WriteFileBai_2("NganNhatX.OUT");
+    }
+
+
+    /* Bài 3. Đường đi ngắn nhất giữa các cặp đỉnh 
+     *  Hãy tìm đường đi ngắn nhất giữa các cặp đỉnh theo thuật toán Floyd – Warshall (tức là tìm ma trận 𝑑𝑖𝑠𝑡[𝑖, 𝑗] là độ
+        dài đường đi ngắn nhất từ đi từ đỉnh 𝑖 đến đỉnh 𝑗). 
+     * Dữ liệu vào: Đọc từ file FloydWarshall.INP
+        • Dòng đầu tiên chứa 1 số nguyên 𝑛 (số đỉnh của đồ thị)
+        • 𝑛 dòng sau, mỗi dòng chứa 𝑛 số nguyên mô tả ma trận trọng số của đồ thị 
+     */
+    static void ReadMatrixBai_3(string inp_file)
+    {
+        string[] lines = File.ReadAllLines(inp_file);
+        n = int.Parse(lines[0]);// Số đỉnh 
+
+
+    }
+
+
+    /*
+     *  Dữ liệu ra: Ghi ra file FloydWarshall.OUT
+        • Dòng đầu tiên chứa 1 số nguyên 𝑛 (số đỉnh của đồ thị)
+        • 𝑛 dòng sau, mỗi dòng chứa 𝑛 số nguyên là ma trận 𝑑𝑖𝑠𝑡[𝑖, 𝑗]
+     */
+    static void WriteFileBai_3 (string out_file)
+    {
+
+    }
+
+
+    //Hàm chuẩn bị chạy bài 3
+    static void Bai3()
+    {
+        ReadMatrixBai_3("FloydWarshall.INP");
+        WriteFileBai_3("FloydWarshall.OUT");
+    }
 
 }
