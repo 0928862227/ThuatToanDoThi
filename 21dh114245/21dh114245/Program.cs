@@ -2361,13 +2361,61 @@ public static class Buoi7
     static bool IsWeakly()
     {
         v_visited = new bool[n + 1];
+        DFSBai_2(1); //Duyej tu dinh 0
+
+        for(int i =1; i <= n; i++)
+        {
+            if (!v_visited[i])
+            {
+                //Neu co dinh chua duoc tham, do thi lien thong yeu
+                return false;
+            }
+        }
+        return true;
        
     }
 
 
     static int EulerBai_2()
     {
+        if (!IsWeakly())
+        {
+            return 0; // Đồ thị liên thông yếu => k có đường đi/chu trình Euler 
+        }
 
+        int[] inDegree = new int[n + 1]; 
+        int[] outDegree = new int[n + 1];
+
+        //Tính bậc vào và bậc ra cho từng đỉnh 
+        for(int u = 1; u <= n; u++)
+        {
+            for(int v = 0; v<n; v++)
+            {
+                if(v_arrayMatrix[u,v] > 0)
+                {
+                    outDegree[u]++;
+                    inDegree[v]++;
+                }
+            }
+        } 
+
+        //Kiểm tra điều kiện Euler 
+        int startNodes = 0, endNodes = 0;
+        for(int i = 1; i <=n; i++)
+        {
+            if (outDegree[i] - inDegree[i] == 1)
+                startNodes++;
+            else if (inDegree[i] - outDegree[i] == 1)
+                endNodes++;
+            else if (inDegree[i] != outDegree[i])
+                return 0; //Nếu có nhiều hơn 2 đỉnh không cân bằng, không có Euler 
+        }
+
+        if (startNodes == 0 && endNodes == 0)
+            return 1; //Chu trình Euler (bậc vào = bậc ra với mọi đỉnh
+        else if (startNodes == 1 && endNodes == 1)
+            return 2; // Đường đi Euler (chính xác 1 đỉnh có bậc ra > bậc vào
+        return 0; //Không có euler 
     }
     /*
      * Dữ liệu ra: File văn bản EulerCoHuong.OUT chứa một dòng duy nhất chứa số nguyên 𝑘, trong đó
