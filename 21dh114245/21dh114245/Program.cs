@@ -18,6 +18,7 @@ namespace _21dh114245
             //Buoi3.Run();
             //Buoi4.Run();
             //Buoi5.Run();
+            //Buoi6.Run();
         }
     }
 
@@ -37,11 +38,14 @@ public static class Buoi1
     static List<List<int>> v_listMatrix3 = new List<List<int>>();  // danh sách chứa từng cặp phần tử gồm nhiều giá trị 
     static int[,] v_arrayMatrix4;
 
+    
+
+
     public static void Run()
     {
         //Bai1();
         //Bai2();
-        Bai3();
+        //Bai3();
         //Bai4();
     }
     static void Bai1()
@@ -320,6 +324,8 @@ public static class Buoi2
     static List<int> reservoirs;
 
     static List<List<int>> v_listMatrix4;
+
+    static List<(int, int)>[] v_MatrixGraph;
 
     public static void Run()
     {
@@ -666,9 +672,35 @@ public static class Buoi2
      */
     public static void ReadMatrixBai_5(string inp_file)
     {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        // Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, 𝑠, 𝑡
+        string[] firstLine = lines[0].Split();
+        n = int.Parse(firstLine[0]); // Đọc số đỉnh
+        m = int.Parse(firstLine[1]); // Đọc số cạnh
+
+
+        // Khởi tạo ma trận
+        v_MatrixGraph = new List<(int, int)>[n + 1];
+        for (int i = 0; i < n; i++)
+        {
+            v_MatrixGraph[i] = new List<(int, int)>();
+        }
+
+        //𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
+        for (int i = 0; i <= m; i++)
+        {
+            string[] edge = lines[i].Split();
+            int u = int.Parse(edge[0]); //(đầu cạnh)
+            int v = int.Parse(edge[1]); //(cuối cạnh)
+            int w = int.Parse(edge[2]); //trọng số 
+
+            v_MatrixGraph[u].Add((v, w)); // Đỉnh u có kề v với trọng số w
+            v_MatrixGraph[v].Add((u, w)); // Đỉnh v có kề u với trọng số w
+        }
 
     }
-
 
 
     /*
@@ -1283,7 +1315,7 @@ public static class Buoi5
     static int[] v_dist;
     static bool[] v_visited;
 
-    static int[] v_dist3;
+    static int[,] v_dist3;
     const int INF = int.MaxValue;
     static int[] v_parent;
     public static void Run()
@@ -1313,13 +1345,13 @@ public static class Buoi5
 
         // Khởi tạo ma trận
         v_MatrixGraph = new List<(int, int)>[n+1];
-        for (int i = 0; i < n; i++)
+        for (int i = 1; i < n; i++)
         {
             v_MatrixGraph[i] = new List<(int, int)>();
         }
 
         //𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
-        for (int i = 0; i <= m; i++)
+        for (int i = 1; i <= m; i++)
         {
             string[] edge = lines[i].Split();
             int u = int.Parse(edge[0]); //(đầu cạnh)
@@ -1599,10 +1631,40 @@ public static class Buoi5
         string[] lines = File.ReadAllLines(inp_file);
         n = int.Parse(lines[0]);// Số đỉnh 
 
-
+        v_dist3 = new int[n+1,m+1];
+        for(int i = 0; i < n; i++)
+        {
+            string[] row = lines[i].Split();
+            for(int j = 0; j <= n; j++)
+            {
+                v_dist3[i,j] = int.Parse(row[j-1]);
+                if(i != j && v_dist3[i,j] == 0) //không có cạnh thì gắn vô cực 
+                {
+                    v_dist3[i, j] = INF / 2;
+                }
+            }
+        }
     }
 
 
+    //Thuật toán Floyd-warshall
+    static void FloydWarshall_Algorithm()
+    {
+        for(int k = 0;k < m;k++)
+        {
+            for(int i = 1;i <= n; i++)
+            {
+                for(int j = 1;j <= n; j++)
+                {
+                    //Tính lại trọng số, nếu nhỏ hơn trọng số đang lưu thi thay đổi 
+                    if (v_dist3[i, j]> v_dist3[i,k] - v_dist3[k, j])
+                    {
+                        v_dist3[i, j] = v_dist3[i, k] + v_dist3[k, j];
+                    }
+                }
+            }
+        }
+    }
     /*
      *  Dữ liệu ra: Ghi ra file FloydWarshall.OUT
         • Dòng đầu tiên chứa 1 số nguyên 𝑛 (số đỉnh của đồ thị)
@@ -1610,7 +1672,19 @@ public static class Buoi5
      */
     static void WriteFileBai_3 (string out_file)
     {
-
+        using (StreamWriter sw = new StreamWriter(out_file)) 
+        { 
+            sw.WriteLine(n);
+            for(int i = 1; i <= n; i++)
+            {
+                for(int j = 1; j <= n; j++)
+                {
+                    if (v_dist3[i, j] == INF / 2) sw.WriteLine("INF "); //Nếu vô cực 
+                    else sw.WriteLine(v_dist3[i, j] + " ");
+                }
+                sw.WriteLine();
+            }
+        }
     }
 
 
@@ -1618,7 +1692,323 @@ public static class Buoi5
     static void Bai3()
     {
         ReadMatrixBai_3("FloydWarshall.INP");
+        FloydWarshall_Algorithm();
         WriteFileBai_3("FloydWarshall.OUT");
     }
 
+}
+
+public static class Buoi6
+{
+    static int m, n, x;
+    static List<(int, int)>[] v_MatrixGraph; //Danh sách kề (đỉnh, trọng số) 
+    static bool[] v_visited;
+    static List<(int, int, int)> v_treeEdges; //Lưu các cạnh của cây khung 
+    static List<(int, int, int)> v_minTreeEdges; //Lưu các cạnh của cây khung nhỏ nhất 
+
+    static int v_totalEdges = 0; //Tổng trọng số của cây khung  
+    static int[] v_parent; //Mảng đại diện của tập hợp con trong Union-Find
+
+    public static void Run()
+    {
+        //Bai1();
+        //Bai2();
+        //Bai3();
+    }
+
+    /* Bài 1. Tìm cây khung> Hãy tìm cây khung của đồ thị 𝐺 theo thuật toán DFS tại đỉnh 1.
+     * Dữ liệu vào: File văn bản CayKhung.INP
+        • Dòng đầu tiên chứa hai số nguyên 𝑛, 𝑚 (𝑛, 𝑚 ≤ 105), trong đó 𝑛 là số đỉnh, 𝑚 là số cạnh của đồ
+            thị.
+        • 𝑚 dòng tiếp theo, mỗi dòng chứa hai số 𝑢, 𝑣, 𝑤 mô tả cạnh (𝑢, 𝑣) có trọng số 𝑤 trong đồ thị. 
+     */
+    static void ReadMatrixBai_1(string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        // Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, 𝑠, 𝑡
+        string[] firstLine = lines[0].Split();
+        n = int.Parse(firstLine[0]); // Đọc số đỉnh
+        m = int.Parse(firstLine[1]); // Đọc số cạnh
+        
+
+        // Khởi tạo ma trận
+        v_MatrixGraph = new List<(int, int)>[n + 1];
+        for (int i = 1; i < n; i++)
+        {
+            v_MatrixGraph[i] = new List<(int, int)>();
+        }
+
+        //𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
+        for (int i = 1; i <= m; i++)
+        {
+            string[] edge = lines[i].Split();
+            int u = int.Parse(edge[0]); //(đầu cạnh)
+            int v = int.Parse(edge[1]); //(cuối cạnh)
+            int w = int.Parse(edge[2]); //trọng số 
+
+            v_MatrixGraph[u].Add((v, w)); // Đỉnh u có kề v với trọng số w
+            v_MatrixGraph[v].Add((u, w)); // Đỉnh v có kề u với trọng số w
+        }
+    }
+
+
+    static void DFS(int u)
+    {
+        //Dùng đệ qui 
+        v_visited[u] = true;
+        foreach(var (v, w) in v_MatrixGraph[u])
+        {
+            if (!v_visited[v])
+            {
+                v_treeEdges.Add((u, v, w));
+                DFS(v);
+
+            }
+        }
+    }
+
+    static void DFS_Stack(int start)
+    {
+        //Dùng stack, tránh bị deadloop, hiệu quả cho đồ thị lớn 
+        Stack<int> v_stack = new Stack<int>();  
+
+        v_stack.Push(start);
+        v_visited[start] = true; 
+
+        while(v_stack.Count > 0) //Lập đến khi hết stack 
+        {
+            int u = v_stack.Pop(); //Lấy giá trị trên cùng ra
+            foreach(var(v, w) in v_MatrixGraph[u])
+            {
+                if (!v_visited[v])
+                {
+                    v_visited[v] = true;
+                    v_stack. Push(u); // Cho vafo stack
+                    v_treeEdges.Add((u, v, w)); //Cho vao cay khung 
+                }
+            }
+        }
+    }
+
+
+    /*
+     * Dữ liệu ra: File văn bản CayKhung.OUT
+        • Dòng đầu tiên ghi số (𝑛 − 1) là số cạnh trong cây khung.
+        • 𝑛 − 1 dòng tiếp theo, mỗi dòng gồm ba số nguyên 𝑢, 𝑣, 𝑤 mô tả cạnh (𝑢, 𝑣) có trọng số 𝑤 là một
+        cạnh trong cây khung. 
+     */
+    static void WriteFileBai_1(string out_file)
+    {
+        using (StreamWriter sw = new StreamWriter(out_file))
+        {
+            sw.WriteLine(v_treeEdges.Count);
+            foreach(var (u, v,w) in v_treeEdges)
+            {
+                sw.WriteLine($"{u} {v} {w}");
+            }
+        }
+        Console.WriteLine("Write To File Bai1_Buoi6");
+    }
+
+    //Hàm chuẩn bị chạy bài 1
+    static void Bai1()
+    {
+        ReadMatrixBai_1("CayKhung.INP");
+        v_visited = new bool[n + 1];
+        v_treeEdges = new List<(int, int, int)>();
+
+        //DFS(1);
+        DFS_Stack(1);
+        WriteFileBai_1("CayKhung.OUT");
+    }
+
+
+    /* Bài 2. Tìm cây khung nhỏ nhất theo thuật toán Kruskal   
+     * Dữ liệu vào: File văn bản Kruskal.INP  
+        • Dòng đầu tiên chứa hai số nguyên 𝑛, 𝑚 (𝑛, 𝑚 ≤ 105), trong đó 𝑛 là số đỉnh, 𝑚 là số cạnh của đồ 
+        thị.  
+        • 𝑚 dòng tiếp theo, mỗi dòng  chứa ba số 𝑢, 𝑣, 𝑤 cho biết cạnh (𝑢, 𝑣) có trọng số 𝑤 (1 ≤ 𝑤 ≤ 104) 
+     */
+    static void ReadMatrixBai_2(string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        // Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, 𝑠, 𝑡
+        string[] firstLine = lines[0].Split();
+        n = int.Parse(firstLine[0]); // Đọc số đỉnh
+        m = int.Parse(firstLine[1]); // Đọc số cạnh
+
+
+        // Khởi tạo ma trận
+        v_MatrixGraph = new List<(int, int)>[n + 1];
+        for (int i = 1; i < n; i++)
+        {
+            v_MatrixGraph[i] = new List<(int, int)>();
+        }
+
+        //𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
+        for (int i = 1; i <= m; i++)
+        {
+            string[] edge = lines[i].Split();
+            int u = int.Parse(edge[0]); //(đầu cạnh)
+            int v = int.Parse(edge[1]); //(cuối cạnh)
+            int w = int.Parse(edge[2]); //trọng số 
+
+            //Thêm cạnh vào danh sách (sắp xếp theo trọng số))
+            v_treeEdges.Add((w, u, v)); 
+          
+        }
+    }
+
+    private static int Find(int u)
+    {
+        Stack<int> stack = new Stack<int>();    
+        while (v_parent[u] != u)
+        {
+            stack.Push(u);
+            u = v_parent[u];
+        }
+        //Áp dụng nén đường đi
+        while (stack.Count > 0)
+        {
+            int node = stack.Pop();
+            v_parent[node] = u;
+        }
+        return u;
+    }
+
+    private static void Union (int u, int v)
+    {
+        int rootU = Find(u);
+        int rootV = Find(v);
+        if(rootU != rootV)
+            v_parent[rootV] = rootU; //Hợp nhất hai tập hợp, 
+
+    }
+
+    static void Kruskal()
+    {
+        v_treeEdges.Sort(); //Sắp xếp cạnh theo trọng số tăng dần 
+        v_parent = new int[n + 1];
+        v_minTreeEdges = new List<(int, int, int)>();
+        for(int i = 0; i <= n; i++)
+        {
+            v_parent[i] = i;
+        }
+        foreach(var(w, u, v) in v_treeEdges)
+        {
+            //Nếu u và v không thuộc cùng tập hợp, không cùng gốc 
+            if(Find(u) != Find(v))
+            {
+                Union(u, v); //ghép 2 tập hợp cùng gốc
+                v_minTreeEdges.Add((u, v, w)); //Thêm vào tập cây khung nhỏ nhất 
+                v_totalEdges += w;
+
+                //Đủ n-1 cạnh thì dừng 
+                if (v_minTreeEdges.Count == n - 1)
+                    break;
+            }
+        }
+    }
+
+    /*
+     * Dữ liệu ra: File văn bản Kruskal.OUT  
+        • Dòng đầu tiên ghi số hai số tương ứng là số cạnh và tổng trọng số của cây khung nhỏ nhất.  
+        • 𝑛 − 1 dòng tiếp theo, mỗi dòng gồm ba số 𝑢, 𝑣, 𝑤 cho biết cạnh (𝑢, 𝑣) là cạnh trong cây khung nhỏ 
+        nhất có trọng số 𝑤.  
+     */
+    static void WriteFileBai_2(string out_file)
+    {
+        using (StreamWriter sw = new StreamWriter(out_file))
+        {
+            sw.WriteLine($"{v_minTreeEdges.Count} {v_totalEdges}");
+            foreach (var (u, v, w) in v_minTreeEdges)
+            {
+                sw.WriteLine($"{u} {v} {w}");
+            }
+        }
+        Console.WriteLine("Write To File Bai2_Buoi6");
+    }
+
+
+    //Hàm chuẩn bị chạy bài 2
+    static void Bai2()
+    {
+        ReadMatrixBai_2("Kruskal.INP");
+        Kruskal();
+        WriteFileBai_2("Kruskal.OUT");
+    }
+
+    /* Bai 3: Hãy tìm cây khung nhỏ nhất của đồ thị 𝐺 theo thuật toán Prim bắt đầu từ đỉnh 1 và tính tổng độ dài các cạnh của cây 
+       khung tìm được.
+     * Dữ liệu vào: File văn bản Prim.INP  
+        • Dòng đầu tiên chứa hai số nguyên 𝑛, 𝑚 (𝑛, 𝑚 ≤ 105), trong đó 𝑛 là số đỉnh, 𝑚 là số cạnh của đồ 
+        thị.  
+        • 𝑚 dòng tiếp theo, mỗi dòng  chứa ba số 𝑢, 𝑣, 𝑤 cho biết cạnh (𝑢, 𝑣) có trọng số 𝑤 (1 ≤ 𝑤 ≤ 104) 
+     */
+    static void ReadMatrixBai_3(string inp_file)
+    {
+        ReadMatrixBai_1(inp_file);
+    }
+
+    static void Prim()
+    {
+        v_minTreeEdges = new List<(int, int, int)>();
+        v_visited = new bool[n+1]; //Đánh dấu đỉnh đã 
+        SortedSet<(int, int, int)> v_pqueue = new SortedSet<(int, int, int)>();
+
+        v_visited[1] = true; //Bắt đầu từ đỉnh 1
+        foreach(var(v,w) in v_MatrixGraph[1])
+        {
+            v_pqueue.Add((w, 1, v)); //(trọng số, đỉnh 1, đỉnh k))
+        }
+
+        while(v_pqueue.Count > 0 && v_minTreeEdges.Count < n -1)
+        {
+            var (w, u, v) = v_pqueue.Min; //Lấy cạnh có trọng số nhỏ nhất 
+            v_pqueue.Remove(v_pqueue.Min); //Xóa khỏi hàng đợi 
+
+            if (v_visited[v]) continue; //Bỏ qua nếu định đã xem 
+
+            v_minTreeEdges.Add((u, v, w)); //Thêm cạnh vào tập cây 
+            v_totalEdges += w; // tính tổng trọng số đã đi qua 
+            v_visited[v] = true; // đánh dấu đỉnh đã xét 
+
+            foreach(var(du, dw) in v_MatrixGraph[v])
+                if (!v_visited[du])
+                    v_pqueue.Add((dw,v,du));
+        }
+
+    }
+
+
+    /*
+     * Dữ liệu ra: File văn bản Prim.OUT  
+        • Dòng đầu tiên ghi số hai số tương ứng là số cạnh và tổng trọng số của cây khung nhỏ nhất.  
+        • 𝑛 − 1 dòng tiếp theo, mỗi dòng gồm ba số 𝑢, 𝑣, 𝑤 cho biết cạnh (𝑢, 𝑣) là cạnh trong cây khung nhỏ 
+        nhất có trọng số 𝑤.   
+     */
+    static void WriteFileBai_3(string out_file)
+    {
+        using (StreamWriter sw = new StreamWriter(out_file))
+        {
+            sw.WriteLine($"{v_minTreeEdges.Count} {v_totalEdges}");
+            foreach (var (u, v, w) in v_minTreeEdges)
+            {
+                sw.WriteLine($"{u} {v} {w}");
+            }
+        }
+        Console.WriteLine("Write To File Bai3_Buoi6");
+    }
+
+    //Hàm chuẩn bị chạy bài 3
+    static void Bai3()
+    {
+        ReadMatrixBai_3("Prim.INP");
+        Prim();
+        WriteFileBai_3("Prim.OUT");
+    }
 }
