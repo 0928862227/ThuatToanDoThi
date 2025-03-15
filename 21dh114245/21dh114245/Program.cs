@@ -19,6 +19,7 @@ namespace _21dh114245
             //Buoi4.Run();
             //Buoi5.Run();
             //Buoi6.Run();
+            //Buoi7.Run():
         }
     }
 
@@ -1708,12 +1709,15 @@ public static class Buoi6
 
     static int v_totalEdges = 0; //Tổng trọng số của cây khung  
     static int[] v_parent; //Mảng đại diện của tập hợp con trong Union-Find
+    static int q; //số nguyên Q trong bài 5
 
     public static void Run()
     {
         //Bai1();
         //Bai2();
         //Bai3();
+        //Bai4():
+        //Bai5();
     }
 
     /* Bài 1. Tìm cây khung> Hãy tìm cây khung của đồ thị 𝐺 theo thuật toán DFS tại đỉnh 1.
@@ -2011,4 +2015,377 @@ public static class Buoi6
         Prim();
         WriteFileBai_3("Prim.OUT");
     }
+
+
+    /* Bài 4: Hãy tìm cây khung nhỏ nhất có độ dài cạnh nhỏ nhất trong cây khung lớn hơn hay bằng 𝑥. 
+     * Input: CayKhungX.INP
+        • Dòng thứ nhất chứa ba số 𝑛, 𝑚, 𝑥
+        • 𝑀 dòng sau chứa bộ ba số (𝑢𝑖, 𝑣𝑖, 𝑤𝑖) mô tả cạnh thứ (𝑢𝑖, 𝑣𝑖) có trọng số 𝑤𝑖 (1 ≤ 𝑤𝑖≤ 104)
+     */
+    static void ReadMatrixBai_4(string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        // Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, x
+        string[] firstLine = lines[0].Split();
+        n = int.Parse(firstLine[0]); // Đọc số đỉnh
+        m = int.Parse(firstLine[1]); // Đọc số cạnh
+        x = int.Parse(firstLine[2]); //Điều kiện x
+
+        //𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
+        for (int i = 1; i <= m; i++)
+        {
+            string[] edge = lines[i].Split();
+            int u = int.Parse(edge[0]); //(đầu cạnh)
+            int v = int.Parse(edge[1]); //(cuối cạnh)
+            int w = int.Parse(edge[2]); //trọng số 
+
+            // if(w >= x) //Chỉ thêm cạnh có trọng số >= x
+            //Thêm cạnh vào danh sách (sắp xếp theo trọng số))
+                    v_treeEdges.Add((w, u, v));
+
+        }
+    }
+
+    //Hàm xử lý thuật toán Kruskal có điều kiện: tìm cây khung nhỏ nhất với cạnh có trọng số >= x)
+    static int KruskalBai_4()
+    {
+        int v_total = 0;
+        int v_count = 0; 
+
+        //Lọc chỉ lấy cạnh có trọng số >= x
+        List<(int,int,int)> v_filteredEdges = new List<(int,int,int)> (); 
+        foreach(var edge in v_treeEdges)
+        {
+            if(edge.Item1 >= x) //chỉ lấy cạnh có trọng số >= x
+                v_filteredEdges.Add(edge);
+        }
+        v_filteredEdges.Sort(); //Sắp xếp cạnh theo trọng số tăng dần 
+        v_parent = new int[n + 1];
+        v_minTreeEdges = new List<(int, int, int)> ();
+        for(int i = 0; i <= n; i++)
+        {
+            v_parent[i] = i; //Khởi tạo tập hợp riêng biệt cho mỗi đỉnh 
+        }
+        foreach(var(w, u, v) in v_filteredEdges)
+        {
+            if(Find(u) != Find(v)) //Nếu u và v k thuộc cùng tập hợp, k cùng gốc
+            {
+                Union(u, v); //Ghép 2 tập hợp cùng gốc 
+                v_minTreeEdges.Add((u, v, w)); //Thêm vào tập hợp cây khung nhỏ nhất 
+                v_total += w; 
+                v_count++; //khác với bài 2
+                if (v_count == n - 1) //Đủ n-1 cạnh thì dừng
+                    return v_total; //khác với bài 2
+            }
+        }
+        return -1;
+    }
+
+    /*
+     * Output: CayKhungX.OUT
+        • Chứa số −1 nếu không có cây khung thỏa điều kiện bài toán, nếu có thì ghi tổng trọng số các cạnh
+        của cây khung tìm được. 
+     */
+    static void WriteFileBai_4(string out_file, int result)
+    {
+        File.WriteAllText(out_file, result.ToString());
+    }
+
+    //Hàm chuẩn bị chạy bài 4
+    static void Bai4()
+    {
+        ReadMatrixBai_4("CayKhungX.INP");
+        int result = KruskalBai_4();
+        WriteFileBai_4("CayKhungX.OUT", result);
+    }
+
+    /* Bài 5: Bài tập thực tế    
+     * Có 𝑛 ngôi làng được đánh số từ 1 đến 𝑛, và bạn nên xây dựng một số con đường để mỗi hai làng có thể
+    thông nhau với nhau. Ta nói hai làng A và B là thông nhau khi và chỉ khi có một con đường giữa A và B,
+    hoặc tồn tại một làng C sao cho có một con đường giữa A và C và, C và B thông nhau.
+    Chúng ta biết rằng đã có một số con đường giữa một số làng và công việc của bạn là xây dựng một số con
+    đường sao cho tất cả các làng được thông nhau và chiều dài của tất cả các con đường được xây dựng là tối thiểu. 
+    làng = đỉnh 
+     */
+
+    /*
+     * Dữ liệu vào: File văn bản Roads.INP
+        • Dòng đầu tiên là số nguyên 𝑛 (3 ≤ 𝑛 ≤ 100) là số ngôi làng.
+        • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa chứa 𝑛 số nguyên, số nguyên thứ 𝑗 trong 𝑛 số nguyên này là
+            khoảng cách (giá trị khoảng cách là một số nguyên thuộc [1,1000]) giữa làng 𝑖 và làng 𝑗.
+        • Sau đó là một số nguyên 𝑄
+        • 𝑄 dòng tiếp theo, mỗi dòng chứa hai số nguyên 𝑎 và 𝑏 (1 ≤ 𝑎 < 𝑏 ≤ 𝑛) cho viết con đường giữa
+            làng 𝑎 và làng 𝑏 đã được xây dựng. 
+     */
+    static void ReadMatrixBai_5(string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+        n = int.Parse(lines[0]);
+
+        v_treeEdges = new List<(int, int, int)>();
+
+        //Đọc ma trận kề 
+        for(int i = 1; i <= n; i++)
+        {
+            string[] row = lines[i].Split();
+            //chỉ đọc nửa trên của ma trận( đồ thị vô hướng) 
+            for(int j = i+1; j <= n; j++)
+            {
+                // Đọc trọng số từ ma trận
+                int w = int.Parse(row[j - 1]);
+                // Thêm cạnh vào danh sách 
+                v_treeEdges.Add((w, i - 1, j - 1));
+            }
+        }
+        //Đọc số cạnh đã xây n + 1
+        q = int.Parse(lines[n + 1]);
+
+        //Thêm các cạnh đã xây vào danh sách với trọng số 0, 0 là để ưu tiên cạnh trong Kruskal
+        for(int i = 1; i <= q; i++)
+        {
+            string[] edgeData = lines[n + 1 + i].Split();
+            int a = int.Parse(edgeData[0]) - 1; //Chuyển đổi chỉ số về based
+            int b = int.Parse(edgeData[1]) - 1;
+            v_treeEdges.Add((0, a, b)); //Thêm cạnh đã xây với trọng số 0
+        }            
+    }
+    static int KruskalBai_5()
+    {
+        v_treeEdges.Sort(); //Sắp xếp cạnh theo trọng số tăng dần 
+        v_parent = new int[n];      
+        for (int i = 0; i <= n; i++)
+        {
+            v_parent[i] = i;
+        }
+        int v_total = 0, v_count = 0;
+        foreach (var (w, u, v) in v_treeEdges)
+        {
+            //Nếu cùng làng gốc 
+            if (Find(u) != Find(v))
+            {
+                Union(u, v); // cho 2 làng cùng cha
+                v_total += w; //Tăng trọng số tổng 
+                v_count++; //Đếm số đường đi 
+
+                //Đã xây xong đường đi
+                if (v_count == n - 1)
+                    break;
+            }
+        }
+        //Nếu tìm thấy đường đi thì trả về tổng trọng số 
+        return (v_count == n - 1) ? v_total : -1;
+    }
+
+    /*
+     * Output: File văn bản Roads.OUT
+        • Chứa một dòng duy nhất chứa một số nguyên là chiều dài của tất các con đường cần được xây sao
+        cho tất cả các làng đều thông nhau và giá trị này là giá trị nhỏ nhất. 
+     */
+    static void WriteFileBai_5(string out_file, int result)
+    {
+        WriteFileBai_4(out_file, result);
+    }
+
+    //Hàm chuẩn bị chạy bài 5
+    static void Bai5()
+    {
+        ReadMatrixBai_5("Roads.INP");
+        int result = KruskalBai_5();
+        WriteFileBai_5("Roads.OUT", result);
+    }
 }
+
+public static class Buoi7
+{
+    static int n; //Sổ đỉnh đồ thị 
+    static int[,] v_arrayMatrix; //Ma trận kề đồ thị 
+
+    static List<(int, int)>[] v_MatrixGraph; //Danh sách kề (đỉnh, trọng số) 
+    static bool[] v_visited;
+    public static void Run()
+    {
+        //Bai1();
+        //Bai2();
+        //Bai3();
+        
+    }
+
+    /* Bài 1. Kiểm tra Euler trên đồ thị vô hướng
+     * Dữ liệu vào: File văn bản EulerVoHuong.INP
+        • Dòng đầu tiên chứa số nguyên 𝑛 là số đỉnh của đồ thị.
+        • 𝑛 dòng tiếp theo, mỗi dòng chứa 𝑛 số biểu diễn ma trận kề của đồ thị. 
+     */
+    static void ReadMatrixBai_1(string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        //số đỉnh của đồ thị
+        n = int.Parse(lines[0]);
+
+        //ma trận kề
+        v_arrayMatrix = new int[n+1, n+1];
+
+        for (int i = 0; i < n; i++)
+        {
+            string[] row = lines[i].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int j = 0; j < n; j++)
+            {
+                v_arrayMatrix[i, j] = int.Parse(row[j - 1]);
+            }
+        }
+    }
+
+    //Kiểm tra đồ thị có chu trình Euler hoặc đường đi euler 
+    private static bool Connected()
+    {
+        v_visited = new bool[n + 1];
+        int startNode = -1; 
+
+        //Tìm một đỉnh có ít nhất một cạnh để bắt đầu DFS, có thể bắt đầu tử đỉnh 1
+        for(int i = 1; i <= n; i++)
+        {
+            for(int j = 1; j <= n; j++)
+            {
+                if (v_arrayMatrix[i,j] > 0)
+                {
+                    startNode = i;
+                    break;
+                }
+            }
+            if (startNode != -1) break;
+        }
+        if (startNode == -1) return false; //Nếu k có cạnh nào, đồ thị không liên thông 
+        DFSBai_1(startNode); //Kiểm tra liên thông 
+
+        //Kiểm tra tất cả các đỉnh có bậc > 0 có được duyệt hay không
+        for(int i = 1; i <= n; i++)
+        {
+            if (!v_visited[i])
+            {
+                for(int j = 1; j <= n; j++)
+                {
+                    if(v_arrayMatrix[i,j] > 0) return false; 
+                }
+            }
+        }
+        return true;
+    }
+
+    //Hàm DFS kiểm tra tính liên thông
+    private static void DFSBai_1(int u)
+    {
+        v_visited[u] = true; //Đánh dấu đỉnh u đã được thăm 
+        //Lần lượt duyệt từng đỉnh để gọi đệ qui
+        for(int v = 1; v<= n; v++)
+        {
+            if (v_arrayMatrix[u, v] > 0 && !v_visited[v])
+            {
+                DFSBai_1(v);
+            }
+        }
+    }
+
+    private static int CountOddDegree()
+    {
+        int v_oddCount = 0;
+        //duyệt hàng
+        for(int i = 1; i <= n; i++)
+        {
+            int v_degree = 0;
+            //Duyệt cột
+            for(int j = 1; j <= n; j++)
+            {
+                //Đếm số cạnh của đỉnh i
+                v_degree += v_arrayMatrix[i, j];
+            }
+            if (v_degree % 2 == 1) v_oddCount++; //Nếu là bậc lẻ thì tăng count
+        }
+        return v_oddCount;
+    }
+
+    static int EulerBai_1()
+    {
+        if(!Connected()) return 0;
+        int v_sum = CountOddDegree();
+        if (v_sum == 0) return 1; //Chu trình euler, không có đỉnh lẻ
+        if(v_sum == 1) return 2; //Đường đi euler, có 2 đỉnh lẻ 
+        return 0;
+    }
+
+    /* Dữ liệu ra: File văn bản EulerVoHuong.OUT • Dòng duy nhất chứa số nguyên 𝑘, trong đó
+             o 𝑘 = 0: 𝐺 là đồ thị không có chu trình Euler, cũng không có đường đi Euler 
+             o 𝑘 = 1: 𝐺 là đồ thị có chu trình Euler
+             o 𝑘 = 2: 𝐺 là đồ thị có đường đi Euler 
+     */
+    static void WriteFileBai_1(string out_file, int result)
+    {
+        File.WriteAllText(out_file, result.ToString());
+    }
+
+
+    //Hàm chuẩn bị chạy bài 1
+    static void Bai1()
+    {
+        ReadMatrixBai_1("EulerVoHuong.INP");
+        int result = EulerBai_1();
+        WriteFileBai_1("EulerVoHuong.OUT", result);
+    }
+
+    /* Bài 2. Kiểm tra Euler trên đồ thị có hướng
+     * Dữ liệu vào: File văn bản EulerCoHuong.INP
+        • Dòng đầu tiên chứa số nguyên 𝑛 là số đỉnh của đồ thị.
+        • 𝑛 dòng tiếp theo, mỗi dòng chứa 𝑛 số biểu diễn ma trận kề của đồ thị
+     */
+    static void ReadMatrixBai_2(string inp_file)
+    {
+       ReadMatrixBai_1(inp_file);
+    }
+
+    static void DFSBai_2(int u)
+    {
+        v_visited[u] = true;
+        for(int v = 1; v <= n; v++)
+        {
+            if ((v_arrayMatrix[u,v] > 0 || v_arrayMatrix[v, u]> 0) && !v_visited[v])
+            {
+                DFSBai_2(v);
+            }
+        } 
+    }
+    //Hàm kiểm đồ thị có liên thông yêu không
+    //Liên thông yếu là cặp đỉnh không có cặp cạnh có hướng k nối tới nhau 
+    static bool IsWeakly()
+    {
+        v_visited = new bool[n + 1];
+       
+    }
+
+
+    static int EulerBai_2()
+    {
+
+    }
+    /*
+     * Dữ liệu ra: File văn bản EulerCoHuong.OUT chứa một dòng duy nhất chứa số nguyên 𝑘, trong đó
+        • 𝑘 = 0: 𝐺 là đồ thị không có chu trình Euler, cũng không có đường đi Euler
+        • 𝑘 = 1: 𝐺 là đồ thị có chu trình Euler
+        • 𝑘 = 2: 𝐺 là đồ thị có đường đi Euler 
+     */
+    static void WriteFileBai_2(string out_file, int result)
+    {
+        File.WriteAllText(out_file, result.ToString());
+    }
+
+    //Hàm chuẩn bị chạy bài 2
+    static void Bai2()
+    {
+        ReadMatrixBai_2("EulerCoHuong.INP");
+        int result = EulerBai_2();
+        WriteFileBai_2("EulerCoHuong.OUT", result);
+    }
+}
+
