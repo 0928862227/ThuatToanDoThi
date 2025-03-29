@@ -724,10 +724,10 @@ public static class Buoi3
     static int[,] v_arrayMatrix;
     //bậc của đỉnh
     static int[] v_degrees;
-    static int[] v_result1;
     static int n, m, s; //s là đỉnh
     static int x, y ;
     static List<int>[] v_adjList;
+    static List<int> v_result1;
     static int[] v_parent2;
 
     static bool v_result3;
@@ -750,7 +750,7 @@ public static class Buoi3
         một cạnh (𝑖,𝑗) của đồ thị.
 
     link file đọc auto : ....\21dh114245\21dh114245\bin\Debug\...
-
+    */
     
     static void ReadMatrixBai_1(string inp_file)
     {
@@ -772,7 +772,7 @@ public static class Buoi3
                 string[] parts = lines[i].Split();
                 foreach(string part in parts)
                 {
-                    v_adjList[i].Add(int Parse(part));
+                    v_adjList[i].Add(int.Parse(part));
                 }
             }
         }
@@ -783,14 +783,14 @@ public static class Buoi3
     {
         Queue<int> v_queue1 = new Queue<int>();
         HashSet<int> v_visited = new HashSet<int>();
-        v_result1 = new List<List<int>>();
+        v_result1 = new List<int>();
         v_queue1.Enqueue(1);
         v_visited.Add(s);
 
-        while(v_queuel.Count > 0)
+        while(v_queue1.Count > 0)
         {
             //lấy giá trị hàng đợi ra 
-            int v_current = v_queuel.Enqueue();
+            int v_current = v_queue1.Dequeue();
 
             if(v_current != s) { v_result1.Add(v_current); }
             //Duyệt
@@ -835,7 +835,7 @@ public static class Buoi3
         • Dòng đầu tiên chứa số 3 số nguyên: 𝑛, 𝑥, 𝑦.
         • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng với
         một cạnh (𝑖,𝑗) của đồ thị.
-     
+    */
     static void ReadMatrixBai_2 (string inp_file)
     {
         //đọc dữ liệu từ file đầu vào
@@ -857,7 +857,7 @@ public static class Buoi3
                 string[] parts = lines[i].Split();
                 foreach(string part in parts)
                 {
-                    v_adjList[i].Add(int Parse(part));
+                    v_adjList[i].Add(int.Parse(part));
                 }
             }
         }
@@ -881,20 +881,20 @@ public static class Buoi3
         v_visited[n] = true;
         v_parent2[n] = -1; // đỉnh xuất phát không có cha
 
-        while(v_queuel.Count > 0)
+        while(v_queue.Count > 0)
         {
             //lấy giá trị hàng đợi ra 
-            int u = v_queue.Enqueue();
+            int u = v_queue.Dequeue();
             //Duyệt
             foreach(int v in v_adjList[u])
             {
                 if (!v_visited[v])
                 {
-                    v_queue1.Enqueue(v);
+                    v_queue.Enqueue(v);
                     v_visited[v] = true;
                     v_parent2[v] = u; //gán giá trị của v là u 
 
-                    if(v = y)
+                    if(v == y)
                     {
                         return;
                     }
@@ -910,7 +910,7 @@ public static class Buoi3
         • Dòng đầu tiên ghi số nguyên dương 𝑘 là số đỉnh nằm trên đường đi từ đỉnh 𝑥 đến đỉnh 𝑦 (Tính luôn
             cả đỉnh 𝑥 và 𝑦).
         • Dòng thứ hai chứa 𝑘 số nguyên là các đỉnh trên đường đi từ 𝑥 đến 𝑦. 
-     
+     */
      static void WriteFileBai_2(string out_file)
     {
         int current = y;
@@ -931,9 +931,9 @@ public static class Buoi3
             }
             Console.WriteLine("Successfully write file");
         }
-        else (Console.WriteLine("Not found"));
+        else Console.WriteLine("Route Not found");
     }
-    */
+    
 
     /* Bài 3: h kiểm tra đồ thị 𝐺 có liên thông không. 
      *  Dữ liệu vào: File văn bản LienThong.INP
@@ -2200,17 +2200,19 @@ public static class Buoi6
 
 public static class Buoi7
 {
-    static int n; //Sổ đỉnh đồ thị 
-    static int[,] v_arrayMatrix; //Ma trận kề đồ thị 
-
+    static int n ,x, start_vertex; //Sổ đỉnh đồ thị 
+    static int[,] v_arrayMatrix, v_arrayMatrix_tmp; //Ma trận kề đồ thị 
+    static List<int> v_eulerCycle;
+    static List<List<int>> v_strokes; 
     static List<(int, int)>[] v_MatrixGraph; //Danh sách kề (đỉnh, trọng số) 
     static bool[] v_visited;
+
     public static void Run()
     {
         //Bai1();
         //Bai2();
         //Bai3();
-        
+        //Bai4();
     }
 
     /* Bài 1. Kiểm tra Euler trên đồ thị vô hướng
@@ -2434,6 +2436,232 @@ public static class Buoi7
         ReadMatrixBai_2("EulerCoHuong.INP");
         int result = EulerBai_2();
         WriteFileBai_2("EulerCoHuong.OUT", result);
+    }
+
+    /* Bài 3: Tìm chu trình Euler 
+     * Dữ liệu vào: File văn bản ChuTrinhEuler.INP
+        • Dòng đầu tiên chứa hai số nguyên 𝑛, 𝑥: 𝑛 là số đỉnh của đồ thị và đỉnh 𝑥.
+        • 𝑛 dòng tiếp theo, mỗi dòng chứa 𝑛 số biểu diễn ma trận kề của đồ thị. 
+     */
+    static void ReadMatrixBai_3(string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        // Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, 𝑠, 𝑡
+        string[] firstLine = lines[0].Split();
+        n = int.Parse(firstLine[0]); // Đọc số đỉnh
+        x = int.Parse(firstLine[1]); // Đọc số đỉnh bắt đầu
+
+
+        // Khởi tạo ma trận
+        v_arrayMatrix = new int[n+1, n+1];
+        for (int i = 1; i <= n; i++)
+        {
+            string[] row = lines[i].Split(new char[] { ' ' },StringSplitOptions.RemoveEmptyEntries);
+            for(int j = 1; j <= n; j++)
+            {
+                v_arrayMatrix[i,j] = int.Parse(row[j-1]);
+            }
+            
+        }
+      
+    }
+
+
+    static bool FindWỉeholzer3()
+    {
+        //Thỏa điều kiện có chu trình euler
+        if(EulerBai_1() == 1)
+        {
+            //Tìm chu trình
+            return true;
+        }
+        return false;   
+    }
+
+    //Hàm xử lý chu trình Euler 
+    static void Wierholzer3()
+    {
+        Stack<int> stack = new Stack<int>();
+        v_eulerCycle = new List<int>();
+        v_arrayMatrix_tmp = (int[,])v_arrayMatrix.Clone(); //Sao chép ma trận gốc
+        stack.Push(x);
+
+        while(stack.Count > 0)
+        {
+            int u = stack.Peek();
+            bool hasEdge = false;
+            for(int v = 1; v <= n; v++)
+            {
+                if (v_arrayMatrix_tmp[u,v] > 0)
+                {
+                    stack.Push(v);
+                    v_arrayMatrix_tmp[u, v]--; //xóa cạnh u,v 
+                    v_arrayMatrix_tmp[v, u]--; //xóa cạnh v,u 
+                    hasEdge = true;
+                    break; //thoát khỏi for 
+                }
+            }
+            if (!hasEdge)
+            {
+                v_eulerCycle.Add(stack.Pop());
+            }
+        }
+    }
+
+    /*
+     * Dữ liệu ra: File văn bản ChuTrinhEuler.OUT
+        • Dòng duy nhất chứa các đỉnh 𝑥, 𝑦1, 𝑦2, … , 𝑥 là chu trình Euler xuất phát từ đỉnh �
+     */
+    static void WriteFileBai_3(string out_file, bool v_find)
+    {
+        using (StreamWriter sw = new StreamWriter(out_file))
+        {
+            if (v_find)
+            {
+                for (int i = 0; i < v_eulerCycle.Count; i++)
+                {
+                    sw.WriteLine(v_eulerCycle[i] + "->");
+                    Console.Write(v_eulerCycle[i] + "->");
+                }
+            }
+            else Console.WriteLine("Không có euler");
+        }
+    }
+
+
+    //Hàm chuẩn bị chạy bài 3
+    static void Bai3()
+    {
+        ReadMatrixBai_3("ChuTrinhEuler.INP");
+        bool result = FindWỉeholzer3();
+        WriteFileBai_3("ChuTrinhEuler.OUT", result);
+    }
+
+
+    /* Bài 4. Vẽ k nét! Hãy tìm cách vẽ tất cả các cạnh của đồ thị 𝐺 bằng 𝑘 nét vẽ, với 𝑘 là số nhỏ nhất có thể. 
+     * Dữ liệu vào: File văn bản kNet.INP
+        • Dòng đầu tiên chứa số nguyên 𝑛 là số đỉnh của đồ thị.
+        • 𝑛 dòng tiếp theo, mỗi dòng chứa 𝑛 số biểu diễn ma trận kề của đồ thị. 
+     */
+    static void ReadMatrixBai_4(string inp_file)
+    {
+       
+        ReadMatrixBai_1(inp_file);
+    
+    }
+    static void Wierholzer4(int start)
+    {
+        Stack<int> stack = new Stack<int>();
+        List<int> stroke = new List<int>();
+        v_arrayMatrix_tmp = (int[,])v_arrayMatrix.Clone(); //Sao chép ma trận gốc
+        stack.Push(x);
+
+        while (stack.Count > 0)
+        {
+            int u = stack.Peek();
+            bool found = false;
+            for (int v = 1; v <= n; v++)
+            {
+                if (v_arrayMatrix_tmp[u, v] > 0)
+                {
+                    stack.Push(v);
+                    v_arrayMatrix_tmp[u, v]--; //xóa cạnh u,v 
+                    v_arrayMatrix_tmp[v, u]--; //xóa cạnh v,u 
+                    found = true;
+                    break; //thoát khỏi for 
+                }
+            }
+            if (!found)
+            {
+                stroke.Add(stack.Pop());
+            }
+        }
+        stroke.Reverse();
+        v_strokes.Add(stroke);
+    }
+
+    static List<int> CountOddVertices()
+    {
+        List<int> oddVertices = new List<int>();
+        //Console.WriteLine("Kiểm tra bậc của đỉnh");
+        for(int i = 1; i < n; i++)
+        {
+            int degree = 0;
+            for(int j = 1; j <= n; j++)
+            {
+                degree += v_arrayMatrix[i, j];
+                if(degree % 2 == 1)
+                    oddVertices.Add(i); //Lưu đỉnh lẻ
+            }           
+        }
+        return oddVertices;
+    }
+
+    static int KNet(int v_start)
+    {
+        List<int> oddVertices = CountOddVertices();
+        start_vertex = v_start; ///Giữ nguyên đỉnh bắt đầu 
+        v_strokes.Clear();
+        if(oddVertices.Count == 0 || oddVertices.Count == 2)
+        {
+            //Kiểm tra xem v_start có hợp lệ k
+            if(!oddVertices.Contains(start_vertex) && oddVertices.Count == 2)
+            {
+                Console.WriteLine($"Đỉnh {start_vertex} không là đỉnh lẻ, chọn {oddVertices[0]}");
+                start_vertex = oddVertices[0]; //Chọn đỉnh lẻ đầu tiên 
+            }
+            Wierholzer4(start_vertex);
+            return 1; //Vì chỉ có 1 nét vẽ Euler
+        }
+        return 0;
+    }
+
+
+
+    /*
+     * Dữ liệu ra: File văn bản kNet.OUT
+        • Dòng đầu tiên là số nguyên 𝑘 là số nét vẽ của đồ thị
+        • 𝑘 dòng tiếp theo, mỗi dòng gồm các đỉnh mô tả một nét vẽ
+     */
+    static void WriteFileBai_4(string out_file, int v_min)
+    {
+        using (StreamWriter sw = new StreamWriter(out_file))
+        {
+            if (v_min > 0)
+            {
+                sw.WriteLine(v_min);
+                foreach(var stroke in v_strokes)
+                {
+                    sw.WriteLine(string.Join("->", stroke));
+                    Console.Write(string.Join("->", stroke));
+                }
+            }
+            else
+            {
+                sw.WriteLine("No");
+                Console.WriteLine("No");
+            }
+        }
+        //In ma trận kề để kiểm tra 
+        Console.WriteLine("Do thi:");
+        for(int i = 1; i <= n; i++)
+        {
+            for(int j = 1; j <= n; j++)
+            {
+                Console.Write(v_arrayMatrix[i, j] + " ");
+            }
+            Console.WriteLine();
+        }
+    }
+
+    //Hàm chuẩn bị chạy bài 4
+    static void Bai4()
+    {
+        ReadMatrixBai_4("kNet.INP");
+        int result = KNet(3);
+        WriteFileBai_4("kNet.OUT", result);
     }
 }
 
