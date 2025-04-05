@@ -14,12 +14,13 @@ namespace _21dh114245
         static void Main(string[] args)
         {
             //Buoi1.Run();
-            //Buoi2.Run();
+            Buoi2.Run();
             //Buoi3.Run();
             //Buoi4.Run();
             //Buoi5.Run();
             //Buoi6.Run();
             //Buoi7.Run():
+            //KiemTra.Run();
         }
     }
 
@@ -51,9 +52,9 @@ public static class Buoi1
     }
     static void Bai1()
     {
-        ReadMatrix("AdjecencyMatrix.INP");
+        ReadMatrix("buoi1/AdjecencyMatrix.INP");
         DegreesofVertices();
-        WriteMatrixBai_1("AdjecencyMatrix,OUT");
+        WriteMatrixBai_1("buoi1/AdjecencyMatrix,OUT");
     }
 
     //tính bậc của các đỉnh trong đồ thị 
@@ -132,9 +133,9 @@ public static class Buoi1
      */
     static void Bai2()
     {
-        ReadMatrix("AdjecencyMatrix.INP");
+        ReadMatrix("buoi1/AdjecencyMatrix.INP");
         Inout_Degrees();
-        WriteMatrixBai_2("BacVaoRa,OUT");
+        WriteMatrixBai_2("buoi1/BacVaoRa,OUT");
     }
 
     //tính bậc vào và bậc ra của từng đỉnh trong đồ thị 
@@ -191,9 +192,9 @@ public static class Buoi1
      */
     static void Bai3()
     {
-        ReadMatrixBai_3("AdjecencyMatrix.INP");
+        ReadMatrixBai_3("buoi1/AdjecencyList.INP");
         CountDegreeBai_3();
-        WriteMatrixBai_3("AdjecencyList,OUT");
+        WriteMatrixBai_3("buoi1/AdjecencyList,OUT");
     }
 
     /*
@@ -272,9 +273,9 @@ public static class Buoi1
      * */
     static void Bai4()
     {
-        ReadMatrixBai_4("AdjecencyMatrix.INP");
+        ReadMatrixBai_4("buoi1/EdgeList.INP ");
         CountDegreeBai_3();
-        WriteMatrixBai_3("AdjecencyList,OUT");
+        WriteMatrixBai_3("buoi1/EdgeList,OUT");
     }
 
 
@@ -333,7 +334,7 @@ public static class Buoi2
         //Bai1();
         //Bai2();
         //Bai3();
-        //Bai4();
+        Bai4();
         //Bai5();
     }
 
@@ -356,7 +357,7 @@ public static class Buoi2
                 vout_adjacencyList1[i] = new List<int>();
             }
 
-            for (int i = 0; i < m; i++)
+            for (int i = 1; i <= m; i++)
             {
                 var edge = reader.ReadLine().Split().Select(int.Parse).ToArray();
                 int u = edge[0], v = edge[1];
@@ -413,9 +414,9 @@ public static class Buoi2
     static void Bai1()
     {
 
-        ReadMatrixBai_1("Canh2Ke.INP");
+        ReadMatrixBai_1("buoi2/Canh2Ke.INP");
         ConvertEdgeListBai_1();
-        WriteFileBai_1("Canh2Ke.OUT");
+        WriteFileBai_1("buoi2/Canh2Ke.OUT");
     }
 
     /*
@@ -425,13 +426,14 @@ public static class Buoi2
         • 𝑛 dòng tiếp theo, dòng thứ 𝑖 chứa một danh sách các đỉnh, mỗi đỉnh 𝑗 trong danh sách tương ứng 
         với một cạnh (𝑖,𝑗) của đồ thị (các đỉnh trong danh sách được sắp xếp từ nhỏ đến lớn). 
      * */
+    //DANH SAch KE
     public static void ReadMatrixBai_2(string inp_file) {
         using (StreamReader reader = new StreamReader(inp_file))
         {
             n = int.Parse(reader.ReadLine()); // Đọc số đỉnh
             v_listMatrix2 = new List<List<int>>();
 
-            for (int i = 0; i < n; i++)
+            for (int i = 1; i < n; i++)
             {
                 var line = reader.ReadLine();
                 if (!string.IsNullOrEmpty(line))
@@ -503,9 +505,9 @@ public static class Buoi2
 
     public static void Bai2()
     {
-        ReadMatrixBai_2("Ke2Canh.INP");
+        ReadMatrixBai_2("buoi2/Ke2Canh.INP");
         ConvertToEdgeList2();
-        WriteFileBai_2("Ke2Canh.OUT");
+        WriteFileBai_2("buoi2/Ke2Canh.OUT");
     }
 
     /*
@@ -587,9 +589,9 @@ public static class Buoi2
 
     public static void Bai3()
     {
-        ReadMatrixBai_3("BonChua.INP");
+        ReadMatrixBai_3("buoi2/BonChua.INP");
         FindReservoirs();
-        WriteFileBai_3("BonChua.OUT");
+        WriteFileBai_3("buoi2/BonChua.OUT");
     }
 
     /*Dữ liệu vào: File văn bản ChuyenVi.INP 
@@ -661,9 +663,9 @@ public static class Buoi2
     }
     public static void Bai4()
     {
-        ReadMatrixBai_4("ChuyenVi.INP");
+        ReadMatrixBai_4("buoi2/ChuyenVi.INP");
         ConvertToTransposeGraph();
-        WriteFileBai_4("ChuyenVi.OUT");
+        WriteFileBai_4("buoi2/ChuyenVi.OUT");
     }
 
     /*  Bai 5: Tìm các cạnh có độ dài dài nhất và tính độ dài trung bình của các cạnh.
@@ -1331,6 +1333,7 @@ public static class Buoi5
         • Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, 𝑠, 𝑡 (tương ứng với số đỉnh , số cạnh
         và 2 đỉnh 𝑠, 𝑡 của đồ thị).
         • 𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
+    DANH SACH CANH 
      */
     static void ReadMatrixBai_1 (string inp_file)
     {
@@ -2665,3 +2668,85 @@ public static class Buoi7
     }
 }
 
+
+public static class KiemTra
+{
+    static int n, x, m; //Sổ đỉnh đồ thị 
+    static int[,] v_arrayMatrix; //Ma trận kề đồ thị 
+    static List<int> v_eulerCycle;
+    //static List<List<int>> v_strokes;
+    static List<(int, int)>[] v_MatrixGraph; //Danh sách kề (đỉnh, trọng số) 
+    static bool[] v_visited;
+
+    static List<(int, int, int)> v_treeEdges; //Lưu các cạnh của cây khung 
+    static List<(int, int, int)> v_minTreeEdges; //Lưu các cạnh của cây khung nhỏ nhất 
+
+    static int v_totalEdges = 0; //Tổng trọng số của cây khung  
+
+    public static void Run()
+    {
+        //BaiKiemTra();     
+    }
+
+    //Hàm chuẩn bị chạy bài 1
+    static void BaiKiemTra()
+    {
+        ReadMatrix("EulerVoHuong.INP");
+        int result = -1;
+        WriteFile_("EulerVoHuong.OUT", result);
+    }
+
+    static void ReadMatrix(string inp_file)
+    {
+        //đọc dữ liệu từ file đầu vào
+        string[] lines = File.ReadAllLines(inp_file);
+
+        // Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, 𝑠, 𝑡
+        string[] firstLine = lines[0].Split();
+        n = int.Parse(firstLine[0]); // Đọc số đỉnh
+        m = int.Parse(firstLine[1]); // Đọc số cạnh
+
+
+        // Khởi tạo ma trận
+        v_MatrixGraph = new List<(int, int)>[n + 1];
+        for (int i = 1; i < n; i++)
+        {
+            v_MatrixGraph[i] = new List<(int, int)>();
+        }
+
+        //𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
+        for (int i = 1; i <= m; i++)
+        {
+            string[] edge = lines[i].Split();
+            int u = int.Parse(edge[0]); //(đầu cạnh)
+            int v = int.Parse(edge[1]); //(cuối cạnh)
+            int w = int.Parse(edge[2]); //trọng số 
+
+            //Thêm cạnh vào danh sách (sắp xếp theo trọng số))
+            v_treeEdges.Add((w, u, v));
+
+        }
+    }
+
+
+    static void WriteFileBai_2(string out_file)
+    {
+        using (StreamWriter sw = new StreamWriter(out_file))
+        {
+            sw.WriteLine($"{v_minTreeEdges.Count} {v_totalEdges}");
+            foreach (var (u, v, w) in v_minTreeEdges)
+            {
+                sw.WriteLine($"{u} {v} {w}");
+            }
+        }
+        Console.WriteLine("Write To File Bai2_Buoi6");
+    }
+
+
+    static void WriteFile_(string out_file, int result)
+    {
+        File.WriteAllText(out_file, result.ToString());
+    }
+
+
+}
