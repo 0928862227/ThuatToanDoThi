@@ -14,13 +14,13 @@ namespace _21dh114245
         static void Main(string[] args)
         {
             //Buoi1.Run();
-            Buoi2.Run();
+            //Buoi2.Run();
             //Buoi3.Run();
             //Buoi4.Run();
             //Buoi5.Run();
             //Buoi6.Run();
             //Buoi7.Run():
-            //KiemTra.Run();
+            KiemTra.Run();
         }
     }
 
@@ -2668,32 +2668,26 @@ public static class Buoi7
     }
 }
 
-
 public static class KiemTra
 {
-    static int n, x, m; //Sổ đỉnh đồ thị 
-    static int[,] v_arrayMatrix; //Ma trận kề đồ thị 
-    static List<int> v_eulerCycle;
-    //static List<List<int>> v_strokes;
-    static List<(int, int)>[] v_MatrixGraph; //Danh sách kề (đỉnh, trọng số) 
-    static bool[] v_visited;
+    static int n, s, m; //Sổ đỉnh, cạnh đồ thị 
 
     static List<(int, int, int)> v_treeEdges; //Lưu các cạnh của cây khung 
     static List<(int, int, int)> v_minTreeEdges; //Lưu các cạnh của cây khung nhỏ nhất 
-
+    static int[] v_parent; //Mảng đại diện của tập hợp con trong Union-Find
     static int v_totalEdges = 0; //Tổng trọng số của cây khung  
 
     public static void Run()
     {
-        //BaiKiemTra();     
+        BaiKiemTra();     
     }
 
-    //Hàm chuẩn bị chạy bài 1
+    //Hàm chuẩn bị chạy bài kiem tra
     static void BaiKiemTra()
     {
-        ReadMatrix("EulerVoHuong.INP");
-        int result = -1;
-        WriteFile_("EulerVoHuong.OUT", result);
+        ReadMatrix("BuoiKiemTra/Kruskal.INP");
+        Kruskal();
+        WriteFile("BuoiKiemTra/Kruskal_Masy.OUT");
     }
 
     static void ReadMatrix(string inp_file)
@@ -2703,50 +2697,95 @@ public static class KiemTra
 
         // Dòng đầu tiên chứa 4 số nguyên 𝑛, 𝑚, 𝑠, 𝑡
         string[] firstLine = lines[0].Split();
-        n = int.Parse(firstLine[0]); // Đọc số đỉnh
-        m = int.Parse(firstLine[1]); // Đọc số cạnh
+        n = int.Parse(firstLine[0]); // Đọc số n là số căn hộ (đỉnh)
+        m = int.Parse(firstLine[1]); // Đọc số m là số đoạn cáp quang đã dùng (cạnh)
 
+        //Dòng thứ 2: chi phí dự toán 
+        s = int.Parse(lines[1]);
 
-        // Khởi tạo ma trận
-        v_MatrixGraph = new List<(int, int)>[n + 1];
-        for (int i = 1; i < n; i++)
-        {
-            v_MatrixGraph[i] = new List<(int, int)>();
-        }
+        //Khởi tạo danh sách cạnh 
+        v_treeEdges = new List<(int, int, int)>();
 
         //𝑚 dòng tiếp theo, mỗi dòng chứa 3 số 𝑢, 𝑣, 𝑤 mô tả cung (𝑢, 𝑣) có trọng số w
-        for (int i = 1; i <= m; i++)
+        for (int i = 2; i < 2+  m; i++)
         {
             string[] edge = lines[i].Split();
             int u = int.Parse(edge[0]); //(đầu cạnh)
             int v = int.Parse(edge[1]); //(cuối cạnh)
-            int w = int.Parse(edge[2]); //trọng số 
+            int w = int.Parse(edge[2]); //trọng số ,là số m cáp quang nối giữa 2 căn hộ này 
 
             //Thêm cạnh vào danh sách (sắp xếp theo trọng số))
             v_treeEdges.Add((w, u, v));
 
         }
     }
+    //Cấu trúc dữ liệu Union_Find (Disjoint Set Union DSU)
+    private static int Find(int u)
+    {
+        if (v_parent[u] != u)
+        {
+            v_parent[u] = Find(v_parent[u]);
+        }
+        return v_parent[u];
+    }
+    private static void Union(int u, int v)
+    {
+        int rootU = Find(u);
+        int rootV = Find(v);
+        if (rootU != rootV)
+            v_parent[rootV] = rootU; //Hợp nhất hai tập hợp, 
+
+    }
+
+    static void Kruskal()
+    {
+        v_treeEdges.Sort(); //Sắp xếp cạnh theo trọng số tăng dần 
+        v_parent = new int[n + 1];
+        v_minTreeEdges = new List<(int, int, int)>();
+        for (int i = 1; i <= n; i++)
+        {
+            v_parent[i] = i;
+        }
+        foreach (var (w, u, v) in v_treeEdges)
+        {
+            //Nếu u và v không thuộc cùng tập hợp, không cùng gốc 
+            if (Find(u) != Find(v))
+            {
+                Union(u, v); //ghép 2 tập hợp cùng gốc
+                v_minTreeEdges.Add((u, v, w)); //Thêm vào tập cây khung nhỏ nhất 
+                v_totalEdges += w;
+
+                //Đủ n-1 cạnh thì dừng 
+                if (v_minTreeEdges.Count == n - 1)
+                    break;
+            }
+        }
+    }
 
 
-    static void WriteFileBai_2(string out_file)
+    static void WriteFile(string out_file)
     {
         using (StreamWriter sw = new StreamWriter(out_file))
         {
-            sw.WriteLine($"{v_minTreeEdges.Count} {v_totalEdges}");
-            foreach (var (u, v, w) in v_minTreeEdges)
+            sw.WriteLine($"Chi phí m cáp quang nhỏ nhất là: {v_totalEdges}");
+            sw.WriteLine($"Chi phí dự toán S là: {s}");
+            sw.WriteLine($"=>{(v_totalEdges <= s ? "ĐẠT" : "VƯỢT" )} so với dự toán");
+            int minW = int.MaxValue;
+            int maxW = int.MinValue;    
+
+            foreach(var (_,_,w) in v_minTreeEdges)
             {
-                sw.WriteLine($"{u} {v} {w}");
+                if (w < minW) minW = w;
+                if (w > maxW) maxW = w; 
             }
+
+            sw.WriteLine($"Đoạn m ngắn nhất là : {minW}");
+            sw.WriteLine($"Đoạn m dài nhất là : {maxW}");
         }
-        Console.WriteLine("Write To File Bai2_Buoi6");
+        Console.WriteLine("Đã ghi kết quả vào file vào file Kruskal_Masy.OUT ");
     }
 
 
-    static void WriteFile_(string out_file, int result)
-    {
-        File.WriteAllText(out_file, result.ToString());
-    }
-
+  
 
 }

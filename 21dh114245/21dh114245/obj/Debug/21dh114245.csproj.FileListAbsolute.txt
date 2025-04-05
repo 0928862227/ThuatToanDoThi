@@ -12,3 +12,11 @@ C:\Users\user\Desktop\ThuatToanDoThi\21dh114245\21dh114245\obj\Debug\21dh114245.
 C:\Users\user\Desktop\ThuatToanDoThi\21dh114245\21dh114245\obj\Debug\21dh114245.csproj.CoreCompileInputs.cache
 C:\Users\user\Desktop\ThuatToanDoThi\21dh114245\21dh114245\obj\Debug\21dh114245.exe
 C:\Users\user\Desktop\ThuatToanDoThi\21dh114245\21dh114245\obj\Debug\21dh114245.pdb
+C:\Users\SV\Desktop\ThuatToanDoThi\21dh114245\21dh114245\bin\Debug\21dh114245.exe.config
+C:\Users\SV\Desktop\ThuatToanDoThi\21dh114245\21dh114245\bin\Debug\21dh114245.exe
+C:\Users\SV\Desktop\ThuatToanDoThi\21dh114245\21dh114245\bin\Debug\21dh114245.pdb
+C:\Users\SV\Desktop\ThuatToanDoThi\21dh114245\21dh114245\obj\Debug\21dh114245.csproj.AssemblyReference.cache
+C:\Users\SV\Desktop\ThuatToanDoThi\21dh114245\21dh114245\obj\Debug\21dh114245.csproj.SuggestedBindingRedirects.cache
+C:\Users\SV\Desktop\ThuatToanDoThi\21dh114245\21dh114245\obj\Debug\21dh114245.csproj.CoreCompileInputs.cache
+C:\Users\SV\Desktop\ThuatToanDoThi\21dh114245\21dh114245\obj\Debug\21dh114245.exe
+C:\Users\SV\Desktop\ThuatToanDoThi\21dh114245\21dh114245\obj\Debug\21dh114245.pdb
